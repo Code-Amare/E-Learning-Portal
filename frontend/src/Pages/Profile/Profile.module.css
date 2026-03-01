@@ -1,0 +1,525 @@
+/* Profile Container - Reset to original */
+.profileContainer {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-body);
+}
+
+/* Loading State */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.loadingContainer p {
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Header - FIXED: Add centering */
+.profileHeader {
+  padding: 24px 0;
+  margin-bottom: 32px;
+}
+
+.headerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Avatar Section */
+.avatarSection {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+}
+
+.avatarContainer {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: var(--white);
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.avatarFallback.hidden {
+  display: none;
+}
+
+.avatarFallback svg {
+  font-size: 36px;
+}
+
+/* User Info */
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fullName {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.emailSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emailIcon {
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.email {
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--toast-success);
+  border: 1px solid var(--toast-success);
+  background: transparent;
+  margin-top: 4px;
+}
+
+.verifiedBadge svg {
+  font-size: 14px;
+}
+
+/* Header Actions */
+.headerActions {
+  display: flex;
+  gap: 12px;
+}
+
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--toast-error);
+  background: var(--bg-surface);
+  color: var(--toast-error);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background: var(--toast-error);
+  color: var(--white);
+}
+
+/* Main Content - FIXED: Add centering */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Card Styles */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 28px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px var(--card-shadow);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cardHeader h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.cardIcon {
+  font-size: 20px;
+  color: var(--primary);
+}
+
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--primary);
+  background: var(--bg-surface);
+  color: var(--primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.editBtn:hover {
+  background: var(--primary);
+  color: var(--primary-contrast);
+}
+
+/* Card Grid */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* ===== IMPROVED ROW STYLES ===== */
+.cardRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.2s ease;
+}
+
+.cardRow:hover {
+  background-color: rgba(var(--primary-rgb), 0.05);
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.cardRow:last-child {
+  border-bottom: none;
+}
+
+.rowHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rowIcon {
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.3px;
+}
+
+/* ===== IMPROVED VALUE STYLES ===== */
+.value {
+  font-size: 14px;
+  font-weight: 600; /* bold for emphasis */
+  color: var(--text-primary); /* highest contrast */
+  /* optional subtle background – if you have --bg-surface-alt you can add it here */
+}
+
+/* Status Container */
+.statusContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== IMPROVED STATUS BADGES ===== */
+.statusBadge {
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.statusVerified,
+.statusEnabled,
+.statusActive {
+  background: rgba(16, 185, 129, 0.15); /* success green with opacity */
+  color: var(--toast-success);
+  border-color: var(--toast-success);
+}
+
+.statusUnverified {
+  background: rgba(239, 68, 68, 0.15); /* error red with opacity */
+  color: var(--toast-error);
+  border-color: var(--toast-error);
+}
+
+.statusDisabled {
+  background: var(--bg-surface); /* match card background */
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+/* Quick Actions */
+.quickActions {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 28px;
+}
+
+.actionsTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 20px;
+}
+
+.actionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.actionCard {
+  background: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: none;
+  width: 100%;
+}
+
+.actionCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--card-shadow);
+}
+
+.actionIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.actionIcon svg {
+  font-size: 24px;
+}
+
+.actionContent {
+  flex: 1;
+  text-align: left;
+}
+
+.actionContent h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.actionContent p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profileHeader {
+    padding: 20px 0;
+  }
+
+  .headerContent {
+    padding: 0 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .avatarSection {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .userInfo {
+    align-items: center;
+    text-align: center;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .logoutBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mainContent {
+    padding: 0 16px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .editBtn {
+    align-self: flex-start;
+  }
+
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cardRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .statusContainer {
+    align-self: flex-start;
+  }
+
+  .actionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actionCard {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .headerContent {
+    padding: 0 12px;
+  }
+
+  .mainContent {
+    padding: 0 12px;
+  }
+
+  .avatarContainer {
+    width: 64px;
+    height: 64px;
+  }
+
+  .fullName {
+    font-size: 24px;
+  }
+
+  .email {
+    font-size: 14px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .cardHeader h2 {
+    font-size: 16px;
+  }
+
+  .actionIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .actionIcon svg {
+    font-size: 20px;
+  }
+}

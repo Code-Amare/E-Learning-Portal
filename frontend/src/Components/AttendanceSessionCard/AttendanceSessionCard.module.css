@@ -1,0 +1,151 @@
+.sessionCard {
+  display: block;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.sessionCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--card-shadow);
+}
+
+/* REMOVED ALL LEFT BORDER STYLES - NO border-left anywhere */
+
+/* Card Header */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.statusIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sessionCard.open .statusIndicator {
+  color: var(--toast-success);
+}
+
+.sessionCard.closed .statusIndicator {
+  color: var(--toast-error);
+}
+
+.arrowIcon {
+  color: var(--text-secondary);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.sessionCard:hover .arrowIcon {
+  color: var(--primary);
+  transform: translateX(2px);
+}
+
+/* Card Body */
+.cardBody {
+  padding: 20px;
+}
+
+.sessionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  line-height: 1.4;
+}
+
+.sessionMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.metaItem svg {
+  color: var(--text-secondary);
+  width: 14px;
+  opacity: 0.8;
+}
+
+.lastUpdated {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Card Footer */
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-body);
+}
+
+.sessionId {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+
+.openBadge,
+.closedBadge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.openBadge {
+  background: var(--toast-bg-success);
+  color: var(--toast-success);
+  border: 1px solid var(--toast-success);
+}
+
+.closedBadge {
+  background: var(--toast-bg-error);
+  color: var(--toast-error);
+  border: 1px solid var(--toast-error);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .cardHeader,
+  .cardBody,
+  .cardFooter {
+    padding: 12px 16px;
+  }
+
+  .sessionTitle {
+    font-size: 15px;
+  }
+
+  .metaItem {
+    font-size: 13px;
+  }
+
+  .sessionId {
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,44 @@
+/* AsyncButton.module.css */
+
+.customBtn {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background-color: #111827;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px; /* Ensures button doesn't shrink too much when content changes */
+  min-height: 50px;
+}
+
+.customBtn:hover:not(:disabled) {
+  background-color: #1f2937;
+  border-color: #1cd425;
+}
+
+.customBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Spinner Styles */
+.loader {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #c4c4c450;
+  border-top-color: #ffffff;
+  animation: spin013151 1s linear infinite;
+  border-radius: 100%;
+}
+
+@keyframes spin013151 {
+  to {
+    transform: rotate(360deg);
+  }
+}

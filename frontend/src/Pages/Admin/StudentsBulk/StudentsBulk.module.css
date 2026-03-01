@@ -1,0 +1,1000 @@
+.StudentsBulkUploadContainer {
+  min-height: 100vh;
+  background-color: var(--bg-body);
+}
+
+.StudentsBulkUpload {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header Styles */
+.header {
+  margin-bottom: 32px;
+}
+
+.headerContent {
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerIcon {
+  color: var(--primary);
+}
+
+.subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.headerActions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.infoButton {
+  background-color: var(--bg-body);
+  border-color: var(--border-color);
+}
+
+.templateButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.templateButton {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.templateButton:hover {
+  background-color: var(--bg-body);
+}
+
+/* Upload Section */
+.uploadSection {
+  margin-bottom: 32px;
+}
+
+.uploadCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 1px 3px var(--card-shadow);
+}
+
+.uploadHeader {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.uploadHeader h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.uploadSubtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+/* Drop Zone */
+.dropZone {
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 24px;
+  background-color: var(--bg-body);
+}
+
+.dropZone:hover {
+  border-color: var(--primary);
+}
+
+.dropZone.dragOver {
+  border-color: var(--primary);
+  background-color: var(--bg-surface);
+}
+
+.fileInput {
+  display: none;
+}
+
+.dropZoneContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.dropZoneIcon {
+  font-size: 48px;
+  color: var(--text-secondary);
+}
+
+.dropZoneText {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.dropZoneHint {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* File Selected */
+.fileSelected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background-color: var(--bg-body);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fileIcon {
+  font-size: 24px;
+  color: var(--primary);
+}
+
+.fileDetails h4 {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.fileDetails p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.removeFileButton {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.removeFileButton:hover {
+  color: var(--danger);
+  background-color: var(--bg-body);
+}
+
+/* Upload Actions */
+.uploadActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.uploadButton {
+  padding: 12px 32px;
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.uploadButton:hover:not(.disabled) {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--card-shadow);
+}
+
+.uploadButton.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clearButton {
+  padding: 12px 24px;
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clearButton:hover {
+  background-color: var(--bg-body);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Template Info Modal */
+.templateInfoModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalContent {
+  background-color: var(--bg-surface);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalHeader h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+}
+
+.modalBody {
+  padding: 24px;
+}
+
+.infoSection {
+  margin-bottom: 24px;
+}
+
+.infoSection h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.columnsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.columnItem {
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.columnName {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.columnDescription {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.exampleTable {
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.exampleHeader {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.exampleCell {
+  padding: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  border-right: 1px solid var(--border-color);
+}
+
+.exampleCell:last-child {
+  border-right: none;
+}
+
+.exampleRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.exampleRow .exampleCell {
+  font-weight: normal;
+  color: var(--text-secondary);
+}
+
+.note {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.noteIcon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.noteContent {
+  flex: 1;
+}
+
+.noteContent strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.noteContent ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-secondary);
+}
+
+.noteContent li {
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+/* Results Section */
+.resultsSection {
+  margin-top: 32px;
+}
+
+.resultsTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1px;
+}
+
+.tabButton {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tabButton:hover {
+  color: var(--text-primary);
+}
+
+.tabButton.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+.tabContent {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Summary Card */
+.summaryCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.summaryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.summaryHeader h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.summaryStats {
+  display: flex;
+  gap: 32px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.noteCard {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.noteCard .noteIcon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.noteCard p {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Errors Card */
+.errorsCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.errorsHeader {
+  padding: 24px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-body);
+}
+
+.errorsHeader h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.errorsSubtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.errorsList {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.errorItem {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.errorItem:hover {
+  background-color: var(--bg-body);
+}
+
+.errorItem:last-child {
+  border-bottom: none;
+}
+
+.errorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.errorRow {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: var(--bg-body);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.errorEmail {
+  font-size: 14px;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.errorDetails {
+  padding-left: 8px;
+}
+
+.fieldError {
+  font-size: 14px;
+  color: var(--danger);
+  margin-bottom: 4px;
+  padding: 4px 0;
+}
+
+.fieldError:last-child {
+  margin-bottom: 0;
+}
+
+/* Students Card */
+.studentsCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.studentsHeader {
+  padding: 24px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-body);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.studentsHeader h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.studentsActions {
+  display: flex;
+  gap: 12px;
+}
+
+.togglePasswordsButton {
+  padding: 8px 16px;
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.togglePasswordsButton:hover {
+  background-color: var(--bg-body);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.studentsTableContainer {
+  overflow-x: auto;
+}
+
+.studentsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.studentsTable thead {
+  background-color: var(--bg-body);
+}
+
+.studentsTable th {
+  padding: 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.studentsTable td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.studentsTable tbody tr:hover {
+  background-color: var(--bg-body);
+}
+
+.studentsTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.studentName {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.studentEmail {
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.gradeSectionBadge,
+.fieldBadge,
+.messageBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gradeSectionBadge,
+.fieldBadge {
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
+}
+
+.messageBadge {
+  background-color: var(--bg-body);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  max-width: 200px;
+  word-break: break-word;
+}
+
+.passwordCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.passwordValue {
+  font-family: "Monaco", "Consolas", monospace;
+  font-size: 14px;
+  color: var(--text-primary);
+  background-color: var(--bg-body);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  flex: 1;
+  min-width: 120px;
+}
+
+.passwordActions {
+  display: flex;
+  gap: 4px;
+}
+
+.passwordToggle,
+.passwordCopy {
+  padding: 8px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.passwordToggle:hover,
+.passwordCopy:hover {
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+}
+
+.passwordToggle:hover {
+  color: var(--primary);
+}
+
+.passwordCopy:hover {
+  color: var(--primary);
+}
+
+.importantNote {
+  padding: 16px 24px;
+  background-color: var(--bg-body);
+  border-top: 1px solid var(--border-color);
+}
+
+.noteHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+
+.importantNote p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .StudentsBulkUpload {
+    padding: 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .uploadCard {
+    padding: 20px;
+  }
+
+  .uploadHeader h2 {
+    font-size: 20px;
+  }
+
+  .dropZone {
+    padding: 32px 16px;
+  }
+
+  .uploadActions {
+    flex-direction: column;
+  }
+
+  .uploadButton,
+  .clearButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .summaryStats {
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .statItem {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .studentsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .studentsActions {
+    width: 100%;
+  }
+
+  .togglePasswordsButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .studentsTable {
+    min-width: 800px;
+  }
+
+  .passwordCell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .passwordValue {
+    width: 100%;
+  }
+
+  .passwordActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .resultsTabs {
+    flex-direction: column;
+  }
+
+  .tabButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .modalContent {
+    max-height: 90vh;
+  }
+
+  .columnsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+/* Modal overlay – covers the whole screen and centers the modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent backdrop */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal content container – already used in your JSX */
+.templateInfoModal {
+  background-color: var(--bg-surface);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

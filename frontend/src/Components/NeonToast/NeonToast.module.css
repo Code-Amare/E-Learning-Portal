@@ -1,0 +1,47 @@
+.toaster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 20em;
+  font-size: 1.05rem;
+  border-radius: 12px;
+  padding: 16px 24px;
+  backdrop-filter: blur(8px);
+  text-shadow: 0 0 2px var(--toast-color);
+  color: var(--primary-text) !important;
+  background: var(--toast-bg) !important;
+  border: 1px solid var(--toast-color) !important;
+  box-shadow: 0 0 3px var(--toast-color), 0 0 5px var(--toast-color) !important;
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--toast-color);
+}
+
+.text {
+  color: var(--primary-text);
+}
+/* Success */
+.toaster-success {
+  --toast-bg: var(--toast-bg-success);
+  --toast-color: var(--toast-success);
+}
+
+/* Error */
+.toaster-error {
+  --toast-bg: var(--toast-bg-error);
+  --toast-color: var(--toast-error);
+}
+
+/* Warning */
+.toaster-warning {
+  --toast-bg: var(--toast-bg-warning);
+  --toast-color: var(--toast-warning);
+}
+
+/* Info */
+.toaster-info {
+  --toast-bg: var(--toast-bg-info);
+  --toast-color: var(--toast-info);
+}

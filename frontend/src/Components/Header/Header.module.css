@@ -1,0 +1,296 @@
+/* Header Container */
+.HeaderContainer {
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+}
+
+.HeaderContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+
+/* Logo */
+.Logo {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  transition: color 0.3s;
+}
+
+.Logo:hover {
+  color: var(--primary-hover);
+}
+
+/* Right Controls (Desktop: Theme Toggle + Login + Mobile Button) */
+.RightControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Theme Toggle wrapper */
+.ThemeToggleWrapper {
+  display: flex;
+  align-items: center;
+}
+
+/* Login Button (Desktop) */
+.LoginBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.LoginBtn:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Mobile Menu Button (Hamburger / X) */
+.MobileMenuBtn {
+  display: none; /* Hidden on desktop */
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.MobileMenuBtn:hover {
+  background-color: var(--border-color);
+}
+
+/* Backdrop overlay - now a sibling, positioned fixed */
+.Backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  z-index: 200; /* Above header (100) but below sidebar (300) */
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Side Drawer (Mobile Menu) - now a sibling */
+.SideDrawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 300px;
+  max-width: 80vw;
+  height: 100vh;
+  background-color: var(--bg-surface);
+  z-index: 300; /* Above backdrop */
+  transition: right 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -2px 0 10px var(--card-shadow);
+  pointer-events: auto;
+}
+
+.SideDrawerOpen {
+  right: 0;
+}
+
+/* Drawer Header */
+.DrawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.DrawerTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.CloseDrawerBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.CloseDrawerBtn:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Drawer Content */
+.DrawerContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.5rem;
+}
+
+.DrawerSection {
+  margin-bottom: 2rem;
+}
+
+.DrawerSectionTitle {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.DrawerLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color);
+  transition: color 0.3s;
+}
+
+.DrawerLink:hover {
+  color: var(--primary);
+}
+
+.ThemeSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  color: var(--text-primary);
+}
+
+.DrawerLoginBtn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--bg-body);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: background-color 0.3s;
+  border: 1px solid var(--border-color);
+}
+
+.DrawerLoginBtn:hover {
+  background-color: var(--border-color);
+}
+
+.LoginIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+  border-radius: 50%;
+}
+
+.LoginText {
+  display: flex;
+  flex-direction: column;
+}
+
+.LoginText strong {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.LoginText small {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Drawer Footer */
+.DrawerFooter {
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.FooterLogo {
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.FooterCopyright {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  /* Hide desktop theme toggle and login button in RightControls */
+  .RightControls .ThemeToggleWrapper,
+  .RightControls .LoginBtn {
+    display: none;
+  }
+
+  /* Show mobile menu button */
+  .MobileMenuBtn {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Hide drawer and backdrop on desktop */
+  .SideDrawer,
+  .Backdrop {
+    display: none;
+  }
+
+  /* Mobile menu button hidden on desktop */
+  .MobileMenuBtn {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .HeaderContent {
+    padding: 0.5rem 1rem;
+  }
+
+  .Logo {
+    font-size: 1.25rem;
+  }
+}

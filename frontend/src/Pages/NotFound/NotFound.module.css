@@ -1,0 +1,78 @@
+.notFoundContainer {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-body);
+  font-family: "Inter", sans-serif;
+  color: var(--text-primary);
+  padding: 1rem; /* Prevent content from touching edges */
+}
+
+.content {
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--bg-surface);
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  max-width: 90%; /* Ensure it doesn't overflow on very small screens */
+}
+
+.code {
+  font-size: 8rem;
+  font-weight: 900;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  line-height: 1; /* Prevent extra vertical space */
+}
+
+.message {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background-color: var(--primary-hover);
+  transform: scale(1.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .code {
+    font-size: 6rem;
+  }
+  .message {
+    font-size: 1.1rem;
+  }
+  .content {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .code {
+    font-size: 4rem;
+  }
+  .message {
+    font-size: 1rem;
+  }
+  .button {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  .content {
+    padding: 1rem;
+  }
+}

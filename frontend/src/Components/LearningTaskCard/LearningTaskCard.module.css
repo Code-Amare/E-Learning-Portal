@@ -1,0 +1,439 @@
+.learningTaskCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+  min-height: 280px;
+  cursor: pointer;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+
+.learningTaskCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--card-shadow);
+  border-color: var(--primary);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+  min-height: 40px;
+}
+
+.titleSection {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
+  max-height: 2.6em;
+  margin: 0;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  align-items: flex-start;
+}
+
+.editBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-body);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.editBtn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: scale(1.05);
+}
+
+.description {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: 4.5em;
+}
+
+.metaInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  min-height: 60px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.metaLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+  padding-top: 2px;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.languageTags,
+.frameworkTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.languageTag,
+.frameworkTag {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.languageTag {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.frameworkTag {
+  background: var(--bg-body);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.githubLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  margin-bottom: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.githubLink:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* Status Badges */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: fit-content;
+  width: fit-content;
+}
+
+.badgeDraft {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badgeRedo {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badgeUnderReview {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.badgeRated {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Grade Section */
+.gradeSection {
+  padding: 16px;
+  background: var(--bg-body);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-sizing: border-box;
+  margin-top: auto;
+}
+
+.gradeDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.starIcon {
+  color: #fbbf24;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.gradeValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.feedbackSection {
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+  min-width: 0;
+}
+
+.feedbackSection strong {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.feedbackSection p {
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: 4.5em;
+  margin: 0;
+}
+
+.createdInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: auto;
+}
+
+.createdInfo svg {
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+/* Responsive Design for Cards */
+@media (max-width: 768px) {
+  .learningTaskCard {
+    padding: 16px;
+    min-height: 250px;
+  }
+
+  .title {
+    font-size: 16px;
+    -webkit-line-clamp: 2;
+    max-height: 2.4em;
+  }
+
+  .actionButtons {
+    gap: 6px;
+  }
+
+  .editBtn {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+
+  .description {
+    font-size: 13px;
+    -webkit-line-clamp: 2;
+    max-height: 3em;
+  }
+
+  .metaItem {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .metaLabel {
+    min-width: 70px;
+    font-size: 11px;
+  }
+
+  .languageTag,
+  .frameworkTag {
+    font-size: 10px;
+    padding: 3px 8px;
+    max-width: 100px;
+  }
+
+  .githubLink {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .gradeSection {
+    padding: 12px;
+  }
+
+  .gradeValue {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 576px) {
+  .learningTaskCard {
+    padding: 14px;
+    min-height: auto;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .titleSection {
+    width: 100%;
+  }
+
+  .actionButtons {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .metaItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .metaLabel {
+    min-width: auto;
+    padding-top: 0;
+  }
+
+  .languageTags,
+  .frameworkTags {
+    width: 100%;
+  }
+
+  .languageTag,
+  .frameworkTag {
+    max-width: none;
+    flex: 1;
+    text-align: center;
+  }
+
+  .githubLink {
+    font-size: 12px;
+    padding: 8px;
+    justify-content: center;
+  }
+
+  .statusBadge {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .feedbackSection p {
+    -webkit-line-clamp: 2;
+    max-height: 3em;
+  }
+}
+
+@media (max-width: 400px) {
+  .learningTaskCard {
+    padding: 12px;
+  }
+
+  .title {
+    font-size: 15px;
+  }
+
+  .description {
+    font-size: 12px;
+  }
+
+  .actionButtons {
+    gap: 4px;
+  }
+
+  .editBtn {
+    width: 28px;
+    height: 28px;
+  }
+}
