@@ -1,0 +1,37 @@
+# ========================
+# Backend (Django/Python)
+# ========================
+
+# Environment variables
+/backend/.env
+
+# SQLite database
+/backend/db.sqlite3
+
+# Python virtual environment
+/backend/venv/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Django stuff
+*.log
+*.pot
+*.py[cod]
+*.sqlite3
+media/
+staticfiles/
+
+# ========================
+# Frontend (React/Node)
+# ========================
+
+# Environment variables
+/frontend/.env
+
+# Node modules
+/frontend/node_modules/
+
+# Build output
+/frontend/build/
