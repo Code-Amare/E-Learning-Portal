@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "api",
     "realtime",
     "management",
+    "courses",
 ]
 
 ASGI_APPLICATION = "core.asgi.application"
