@@ -52,7 +52,7 @@ export default function SideBar({ children }) {
     let adminMenuItems = [
         { icon: <MdDashboard />, text: "Dashboard", to: `/${role}` },
         { icon: <MdPeople />, text: "Students", to: "/admin/students" },
-        { icon: <MdSchool />, text: "Learning Tasks", to: "/admin/learning-tasks" },
+        { icon: <MdSchool />, text: "Learning Tasks", to: "/admin/courses" },
         { icon: <MdSelectAll />, text: "Bulk Operation", to: "/admin/students/bulk-operation" },
         { icon: <MdAdminPanelSettings />, text: "Admins", to: "/admin/staff" },
     ];

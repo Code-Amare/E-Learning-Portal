@@ -13,6 +13,8 @@ const AdminList = lazy(() => import('./Pages/Admin/AdminList/AdminList'))
 const AddAdmin = lazy(() => import('./Pages/Admin/AddAdmin/AddAdmin'))
 const AdminDetail = lazy(() => import('./Pages/Admin/AdminDetail/AdminDetail'))
 const AdminEdit = lazy(() => import('./Pages/Admin/AdminEdit/AdminEdit'))
+const CreateCourse = lazy(() => import("./Pages/Admin/CreateCourse/CreateCourse"))
+const Courses = lazy(() => import("./Pages/Admin/Courses/Courses"))
 
 export default function AdminRoute() {
     return (
@@ -21,13 +23,15 @@ export default function AdminRoute() {
             <Route path="students" element={<Students />} />
             <Route path="student/add" element={<StudentAdd />} />
             <Route path="students/bulk" element={<StudentsBulk />} />
+            <Route path="students/bulk-operation" element={<BulkOperations />} />
             <Route path="student/:id" element={<StudentDetail />} />
             <Route path="student/edit/:id" element={<StudentEdit />} />
-            <Route path="students/bulk-operation" element={<BulkOperations />} />
             <Route path="staff" element={<AdminList />} />
             <Route path="staff/add" element={<AddAdmin />} />
             <Route path="staff/:id" element={<AdminDetail />} />
             <Route path="staff/edit/:id" element={<AdminEdit />} />
+            <Route path="course/add" element={<CreateCourse />} />
+            <Route path="courses" element={<Courses />} />
         </Routes>
     )
 }

@@ -11,7 +11,6 @@ import {
     FaUser,
     FaSave,
     FaTrash,
-    FaTasks,
     FaCamera,
     FaTimes,
     FaEye
@@ -30,10 +29,10 @@ export default function StudentEdit() {
     const navigate = useNavigate();
     const { id } = useParams();
     const fileInputRef = useRef(null);
-    const { updatePageTitle } = useNotifContext()
+    const { updatePageTitle } = useNotifContext();
     useEffect(() => {
-        updatePageTitle("Edit Student")
-    }, [])
+        updatePageTitle("Edit Student");
+    }, []);
 
     const [formData, setFormData] = useState({
         full_name: "",
@@ -45,7 +44,6 @@ export default function StudentEdit() {
         phone_number: "",
         account: "",
         account_status: "active",
-        task_limit: 0,
     });
 
     const [profilePic, setProfilePic] = useState(null);
@@ -76,9 +74,6 @@ export default function StudentEdit() {
             }
             setOriginalData(student);
 
-            // Get task limit from nested structure if available
-            const taskLimit = student.task_limit?.limit || student.task_limit || 0;
-
             setFormData({
                 full_name: student.full_name || "",
                 email: student.email || "",
@@ -89,7 +84,6 @@ export default function StudentEdit() {
                 phone_number: student.phone_number || "",
                 account: student.account || "",
                 account_status: student.account_status || "active",
-                task_limit: taskLimit,
             });
 
             // Set profile picture URL if available
@@ -99,7 +93,6 @@ export default function StudentEdit() {
             }
 
         } catch (error) {
-
             if (error.response?.status === 404) {
                 neonToast.error("Student not found", "error");
                 navigate("/admin/students");
@@ -161,8 +154,6 @@ export default function StudentEdit() {
         setFormData(prev => ({ ...prev, [name]: value }));
 
         if (originalData) {
-            const originalTaskLimit = originalData.task_limit?.limit || originalData.task_limit || 0;
-
             const isChanged =
                 (name === "full_name" && value !== originalData.full_name) ||
                 (name === "email" && value !== originalData.email) ||
@@ -172,11 +163,9 @@ export default function StudentEdit() {
                 (name === "field" && value !== originalData.field) ||
                 (name === "phone_number" && value !== originalData.phone_number) ||
                 (name === "account" && value !== originalData.account) ||
-                (name === "account_status" && value !== originalData.account_status) ||
-                (name === "task_limit" && parseInt(value) !== originalTaskLimit);
+                (name === "account_status" && value !== originalData.account_status);
 
             setHasChanges(prev => isChanged || prev);
-
         }
 
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
@@ -204,14 +193,6 @@ export default function StudentEdit() {
         if (!formData.phone_number.trim()) newErrors.phone_number = "Phone number is required";
         else if (!/^[\d\s\-\+\(\)]+$/.test(formData.phone_number))
             newErrors.phone_number = "Phone number is invalid";
-
-        // Validate task limit
-        if (isNaN(formData.task_limit))
-            newErrors.task_limit = "Task limit must be a number";
-        else if (parseInt(formData.task_limit) < 0)
-            newErrors.task_limit = "Task limit cannot be negative";
-        else if (parseInt(formData.task_limit) > 100)
-            newErrors.task_limit = "Task limit cannot exceed 100";
 
         // Validate profile picture if new file is selected
         if (profilePicFile) {
@@ -249,8 +230,6 @@ export default function StudentEdit() {
             formDataToSend.append("phone_number", formData.phone_number.trim());
             formDataToSend.append("account", formData.account.trim() || "N/A");
             formDataToSend.append("account_status", formData.account_status);
-            formDataToSend.append("task_limit", Number(formData.task_limit));
-
 
             // Append profile picture if selected
             if (profilePicFile) {
@@ -287,7 +266,6 @@ export default function StudentEdit() {
             navigate(`/admin/student/${id}`);
 
         } catch (error) {
-
             if (error.response?.status === 400) {
                 const backendErrors = error.response.data?.errors || {};
                 const newErrors = {};
@@ -339,7 +317,6 @@ export default function StudentEdit() {
             navigate("/admin/students");
             return true;
         } catch (error) {
-
             if (error.response?.status === 404) {
                 neonToast.error("Student not found", "error");
             } else if (error.response?.data?.detail) {
@@ -624,39 +601,6 @@ export default function StudentEdit() {
                                     </select>
                                 </div>
                                 {errors.field && <span className={styles.errorText}>{errors.field}</span>}
-                            </div>
-
-                            <div className={styles.formGroup}>
-                                <label htmlFor="task_limit">Task Limit</label>
-                                <div className={styles.inputWithIcon}>
-                                    <FaTasks className={styles.inputIcon} />
-                                    <input
-                                        type="number"
-                                        id="task_limit"
-                                        name="task_limit"
-                                        value={formData.task_limit ?? 0}
-                                        onChange={(e) => {
-                                            const value = e.target.value === "" ? 0 : Number(e.target.value); // always number
-                                            setFormData(prev => ({ ...prev, task_limit: value }));
-
-                                            // also update hasChanges flag
-                                            if (originalData) {
-                                                const originalTaskLimit = originalData.task_limit?.limit || originalData.task_limit || 0;
-                                                setHasChanges(prev => value !== originalTaskLimit || prev);
-                                            }
-
-                                            if (errors.task_limit) setErrors(prev => ({ ...prev, task_limit: "" }));
-                                        }}
-                                        placeholder="0"
-                                        min="0"
-                                        max="300"
-                                        className={errors.task_limit ? styles.errorInput : ""}
-                                    />
-                                </div>
-                                {errors.task_limit && <span className={styles.errorText}>{errors.task_limit}</span>}
-                                <small className={styles.helperText}>
-                                    Maximum number of tasks allowed (0-100)
-                                </small>
                             </div>
 
                             <div className={styles.formGroup}>

@@ -6,17 +6,21 @@ import api from "../../Utils/api";
 import { LoadingContext } from "../../Context/LoaderContext";
 import FullScreenSpinner from "../../Components/FullScreenSpinner/FullScreenSpinner";
 import { neonToast } from "../../Components/NeonToast/NeonToast";
-import { useUser } from "../../Context/UserContext";
 
 const Register = () => {
     const [email, setEmail] = useState("");
     const [fullName, setFullName] = useState("");
+    const [grade, setGrade] = useState("");
+    const [section, setSection] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     const { globalLoading } = useContext(LoadingContext);
-    const user = useUser();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -25,26 +29,51 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (submitting) return;
 
         if (password !== confirmPassword) {
-            return neonToast.error("Passwords do not match");
+            neonToast.error("Passwords do not match");
+            return;
         }
+
+        if (!grade || !section) {
+            neonToast.error("Grade and Section are required");
+            return;
+        }
+
+        setSubmitting(true);
 
         try {
             await api.post(
                 "api/users/register/",
-                { email, full_name: fullName, password },
+                {
+                    email: email.trim(),
+                    full_name: fullName.trim(),
+                    grade: grade.trim(),
+                    section: section.trim(),
+                    phone_number: phoneNumber.trim(),
+                    password: password.trim(),
+                },
                 { publicApi: true }
             );
 
             neonToast.success("Registration successful! Verification email sent.");
-
-            navigate(`/verify-email/?email=${email}`);
+            navigate(`/verify-email/?email=${encodeURIComponent(email.trim())}`);
 
         } catch (err) {
             console.error(err);
-            const errMsg = err.response?.data?.error || "Something went wrong";
+
+            let errMsg = "Something went wrong";
+
+            if (Array.isArray(err.response?.data?.error)) {
+                errMsg = err.response.data.error[0];
+            } else if (typeof err.response?.data?.error === "string") {
+                errMsg = err.response.data.error;
+            }
+
             neonToast.error(errMsg);
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -53,7 +82,9 @@ const Register = () => {
             {globalLoading && <FullScreenSpinner />}
 
             <header className={styles.TopBar}>
-                <Link to="/" className={styles.HomeLink}>← Back to Home</Link>
+                <Link to="/" className={styles.HomeLink}>
+                    ← Back to Home
+                </Link>
             </header>
 
             <main className={styles.RegisterContainer}>
@@ -81,6 +112,35 @@ const Register = () => {
                         required
                     />
 
+                    <label className={styles.Label}>Grade</label>
+                    <input
+                        type="text"
+                        className={styles.Input}
+                        value={grade}
+                        onChange={(e) => setGrade(e.target.value)}
+                        placeholder="e.g. 10"
+                        required
+                    />
+
+                    <label className={styles.Label}>Section</label>
+                    <input
+                        type="text"
+                        className={styles.Input}
+                        value={section}
+                        onChange={(e) => setSection(e.target.value)}
+                        placeholder="e.g. A"
+                        required
+                    />
+
+                    <label className={styles.Label}>Phone Number</label>
+                    <input
+                        type="tel"
+                        className={styles.Input}
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="e.g. 0912345678"
+                    />
+
                     <label className={styles.Label}>Password</label>
                     <div className={styles.passwordWrapper}>
                         <input
@@ -94,24 +154,40 @@ const Register = () => {
                         <button
                             type="button"
                             className={styles.eyeButton}
-                            onClick={() => setShowPassword(!showPassword)}
+                            onClick={() => setShowPassword((prev) => !prev)}
                         >
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </button>
                     </div>
 
                     <label className={styles.Label}>Confirm Password</label>
-                    <input
-                        type="password"
-                        className={styles.Input}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm your password"
-                        required
-                    />
+                    <div className={styles.passwordWrapper}>
+                        <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            className={styles.passwordInput}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm your password"
+                            required
+                        />
+                        <button
+                            type="button"
+                            className={styles.eyeButton}
+                            onClick={() =>
+                                setShowConfirmPassword((prev) => !prev)
+                            }
+                        >
+                            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
+                    </div>
 
-                    <button type="submit" className={styles.RegisterBtn}>
-                        Register
+                    <button
+                        type="submit"
+                        className={styles.RegisterBtn}
+                        disabled={submitting}
+                        style={{ opacity: submitting ? 0.7 : 1 }}
+                    >
+                        {submitting ? "Registering..." : "Register"}
                     </button>
 
                     <p className={styles.LoginPrompt}>

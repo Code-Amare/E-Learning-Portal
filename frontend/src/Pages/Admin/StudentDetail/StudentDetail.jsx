@@ -11,7 +11,7 @@ import {
     FaGraduationCap, FaUsers, FaBook, FaChalkboardTeacher,
     FaChartLine, FaHistory, FaFileAlt, FaStar, FaCheckCircle,
     FaTimesCircle, FaExclamationTriangle, FaTasks, FaCamera,
-    FaList // Added for learning tasks button
+    FaList
 } from "react-icons/fa";
 import {
     MdEmail, MdLocationOn, MdDateRange,
@@ -20,29 +20,18 @@ import {
 import styles from "./StudentDetail.module.css";
 import { useNotifContext } from "../../../Context/NotifContext";
 
-/* ---------------- MOCK DATA (OUTSIDE COMPONENT) ---------------- */
-const MOCK_ACTIVITIES = [
-    { type: "grade", description: "Math test graded: 88%", timestamp: "2025-01-12T09:30:00" },
-    { type: "attendance", description: "Present in morning class", timestamp: "2025-01-11T08:10:00" },
-    { type: "task", description: "Submitted Physics assignment", timestamp: "2025-01-10T16:45:00" },
-    { type: "system", description: "Profile updated by admin", timestamp: "2025-01-09T14:20:00" }
-];
-
-/* ---------------- COMPONENT ---------------- */
 export default function StudentDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useUser();
-    const { updatePageTitle } = useNotifContext()
+    const { updatePageTitle } = useNotifContext();
     useEffect(() => {
-        updatePageTitle("Student Detail")
-    }, [])
+        updatePageTitle("Student Detail");
+    }, []);
 
     const [student, setStudent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [loadingDelete, setLoadingDelete] = useState(false);
-
-    const [activities] = useState(MOCK_ACTIVITIES);
 
     useEffect(() => {
         if (user == null) return;
@@ -56,10 +45,11 @@ export default function StudentDetail() {
             setLoading(true);
             try {
                 const response = await api.get(`/api/management/student/${id}/`);
+                console.log(response.data);
 
                 if (!mounted) return;
 
-                // Handle the nested response structure
+                // The API returns the student object directly (or wrapped in a "student" property)
                 const studentData = response.data.student || response.data;
                 setStudent(studentData || null);
             } catch (error) {
@@ -74,22 +64,38 @@ export default function StudentDetail() {
         return () => { mounted = false; };
     }, [id, user, navigate]);
 
-    // Helper function to get student data from nested structure
+    // Helper to extract all relevant data from the nested structure
     const getStudentData = () => {
         if (!student) return {};
 
-        // Extract data from the nested structure
-        const userData = student.profile?.user || {};
-        const profileData = student.profile || {};
+        const profile = student.profile || {};
+        const userData = profile.user || {};
 
         return {
-            ...userData,
-            ...profileData,
+            // From user object
+            full_name: userData.full_name,
+            email: userData.email,
+            gender: userData.gender,
+            date_joined: userData.date_joined,
+            email_verified: userData.email_verified,
+            twofa_enabled: userData.twofa_enabled,
+            is_active: userData.is_active,
+
+            // From profile object
+            account: profile.account,
+            field: profile.field,
+            grade: profile.grade,
+            phone_number: profile.phone_number,
+            section: profile.section,
+
+            // Directly from student root
             profile_pic_url: student.profile_pic_url,
-            attendance_summary: student.attendance_summary,
-            learning_tasks: student.learning_tasks,
-            task_limit: student.task_limit,
-            // For status, use is_active from user
+            progress_summary: student.progress_summary || {},
+
+            // ID from user or root
+            id: userData.id || student.id,
+
+            // Derive account status from user.is_active
             account_status: userData.is_active ? "active" : "inactive"
         };
     };
@@ -114,7 +120,6 @@ export default function StudentDetail() {
             navigate("/admin/students");
             return true;
         } catch (error) {
-
             if (error.response?.status === 404) {
                 neonToast.error("Student not found", "error");
             } else if (error.response?.data?.detail) {
@@ -139,34 +144,25 @@ export default function StudentDetail() {
         }
     };
 
-    // Get task limit from student data
-    const getTaskLimit = () => {
-        if (!student) return 0;
-
-        if (student.task_limit && typeof student.task_limit === 'object') {
-            return student.task_limit.limit || 0;
-        }
-
-        return student.task_limit || 0;
-    };
-
-    // Calculate performance from real data
+    // Calculate performance from progress_summary
     const calculatePerformance = () => {
         if (!student) return {
-            averageGrade: "N/A",
-            completedTasks: 0,
-            attendanceRate: 0,
-            rank: "N/A"
+            progressPercentage: 0,
+            finishedCourses: 0,
+            startedCourses: 0,
+            totalCourses: 0,
+            progressPoints: 0,
+            progressRating: "N/A"
         };
 
-        const attendanceRate = student.attendance_summary?.status_percentages?.present || 0;
-        const completedTasks = student.learning_tasks?.total_created || 0;
-
+        const progress = student.progress_summary || {};
         return {
-            averageGrade: "N/A", // Not in API
-            completedTasks,
-            attendanceRate,
-            rank: "N/A" // Not in API
+            progressPercentage: progress.progress_percentage || 0,
+            finishedCourses: progress.finished_courses || 0,
+            startedCourses: progress.started_courses || 0,
+            totalCourses: progress.total_courses || 0,
+            progressPoints: progress.progress_points || 0,
+            progressRating: progress.progress_rating || "N/A"
         };
     };
 
@@ -201,8 +197,6 @@ export default function StudentDetail() {
 
     const studentData = getStudentData();
     const performance = calculatePerformance();
-    const taskLimit = getTaskLimit();
-    const attendanceSummary = student.attendance_summary || {};
 
     return (
         <div className={styles.container}>
@@ -216,13 +210,13 @@ export default function StudentDetail() {
                         </Link>
 
                         <div className={styles.headerActions}>
-                            {/* NEW: Learning Tasks Button */}
+                            {/* NEW: Courses Taken Button (replaces Learning Tasks) */}
                             <button
-                                className={styles.learningTasksBtn}
-                                onClick={() => navigate(`/admin/student/task/${id}`)}
-                                title="View Student Learning Tasks"
+                                className={styles.learningTasksBtn}  // reuse existing class
+                                onClick={() => navigate(`/admin/student/courses/${id}`)}
+                                title="View Courses Taken by Student"
                             >
-                                <FaList /> Learning Tasks
+                                <FaBook /> Courses Taken
                             </button>
 
                             <button
@@ -293,107 +287,101 @@ export default function StudentDetail() {
                     </div>
                 </div>
 
-                {/* STATS */}
+                {/* STATS CARDS using progress data */}
                 <div className={styles.statsGrid}>
-                    <div className={styles.statCard}>
-                        <div className={styles.statIcon}>
-                            <MdGrade />
-                        </div>
-                        <div className={styles.statContent}>
-                            <h3>Total Score</h3>
-                            <p className={styles.statNumber}>{student.learning_tasks.total_admin_rating_plus_bonus}</p>
-                        </div>
-                    </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statIcon}>
-                            <MdAssignment />
-                        </div>
-                        <div className={styles.statContent}>
-                            <h3>Completed Tasks</h3>
-                            <p className={styles.statNumber}>{performance.completedTasks}</p>
-                        </div>
-                    </div>
                     <div className={styles.statCard}>
                         <div className={styles.statIcon}>
                             <FaChartLine />
                         </div>
                         <div className={styles.statContent}>
-                            <h3>Attendance Rate</h3>
-                            <p className={styles.statNumber}>{performance.attendanceRate.toFixed(1)}%</p>
+                            <h3>Progress</h3>
+                            <p className={styles.statNumber}>{performance.progressPercentage}%</p>
                         </div>
                     </div>
-
+                    <div className={styles.statCard}>
+                        <div className={styles.statIcon}>
+                            <FaStar />
+                        </div>
+                        <div className={styles.statContent}>
+                            <h3>Points</h3>
+                            <p className={styles.statNumber}>{performance.progressPoints}</p>
+                        </div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <div className={styles.statIcon}>
+                            <FaTasks />
+                        </div>
+                        <div className={styles.statContent}>
+                            <h3>Finished Courses</h3>
+                            <p className={styles.statNumber}>{performance.finishedCourses} / {performance.totalCourses}</p>
+                        </div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <div className={styles.statIcon}>
+                            <MdGrade />
+                        </div>
+                        <div className={styles.statContent}>
+                            <h3>Rating</h3>
+                            <p className={styles.statNumber} style={{ textTransform: 'capitalize' }}>{performance.progressRating}</p>
+                        </div>
+                    </div>
                 </div>
 
-                {/* ATTENDANCE SUMMARY */}
-                {attendanceSummary.status_counts && (
+                {/* PROGRESS SUMMARY CARD */}
+                {student.progress_summary && (
                     <div className={styles.card}>
-                        <h2 className={styles.cardTitle}><FaCalendarAlt /> Attendance Summary</h2>
-                        <div className={styles.attendanceGrid}>
-                            <div className={styles.attendanceItem}>
-                                <div className={`${styles.attendanceIcon} ${styles.present}`}>
-                                    <FaCheckCircle />
+                        <h2 className={styles.cardTitle}><FaChartLine /> Progress Summary</h2>
+                        <div className={styles.progressGrid}>
+                            <div className={styles.progressItem}>
+                                <div className={styles.progressIcon}>
+                                    <FaCheckCircle style={{ color: '#10b981' }} />
                                 </div>
-                                <div className={styles.attendanceContent}>
-                                    <h3>Present</h3>
-                                    <p className={styles.attendanceCount}>
-                                        {attendanceSummary.status_counts.total_present || 0}
-                                        <span className={styles.attendancePercentage}>
-                                            ({attendanceSummary.status_percentages?.present?.toFixed(1) || 0}%)
-                                        </span>
-                                    </p>
+                                <div className={styles.progressContent}>
+                                    <h3>Finished Courses</h3>
+                                    <p className={styles.progressCount}>{performance.finishedCourses}</p>
                                 </div>
                             </div>
-                            <div className={styles.attendanceItem}>
-                                <div className={`${styles.attendanceIcon} ${styles.late}`}>
-                                    <FaExclamationTriangle />
+                            <div className={styles.progressItem}>
+                                <div className={styles.progressIcon}>
+                                    <FaTasks style={{ color: '#f59e0b' }} />
                                 </div>
-                                <div className={styles.attendanceContent}>
-                                    <h3>Late</h3>
-                                    <p className={styles.attendanceCount}>
-                                        {attendanceSummary.status_counts.total_late || 0}
-                                        <span className={styles.attendancePercentage}>
-                                            ({attendanceSummary.status_percentages?.late?.toFixed(1) || 0}%)
-                                        </span>
-                                    </p>
+                                <div className={styles.progressContent}>
+                                    <h3>Started Courses</h3>
+                                    <p className={styles.progressCount}>{performance.startedCourses}</p>
                                 </div>
                             </div>
-                            <div className={styles.attendanceItem}>
-                                <div className={`${styles.attendanceIcon} ${styles.absent}`}>
-                                    <FaTimesCircle />
+                            <div className={styles.progressItem}>
+                                <div className={styles.progressIcon}>
+                                    <FaBook style={{ color: '#3b82f6' }} />
                                 </div>
-                                <div className={styles.attendanceContent}>
-                                    <h3>Absent</h3>
-                                    <p className={styles.attendanceCount}>
-                                        {attendanceSummary.status_counts.total_absent || 0}
-                                        <span className={styles.attendancePercentage}>
-                                            ({attendanceSummary.status_percentages?.absent?.toFixed(1) || 0}%)
-                                        </span>
-                                    </p>
+                                <div className={styles.progressContent}>
+                                    <h3>Total Courses</h3>
+                                    <p className={styles.progressCount}>{performance.totalCourses}</p>
                                 </div>
                             </div>
-                            <div className={styles.attendanceItem}>
-                                <div className={`${styles.attendanceIcon} ${styles.special}`}>
-                                    <FaExclamationTriangle />
+                            <div className={styles.progressItem}>
+                                <div className={styles.progressIcon}>
+                                    <FaStar style={{ color: '#8b5cf6' }} />
                                 </div>
-                                <div className={styles.attendanceContent}>
-                                    <h3>Special Cases</h3>
-                                    <p className={styles.attendanceCount}>
-                                        {attendanceSummary.status_counts.total_special_case || 0}
-                                        <span className={styles.attendancePercentage}>
-                                            ({attendanceSummary.status_percentages?.special_case?.toFixed(1) || 0}%)
-                                        </span>
-                                    </p>
+                                <div className={styles.progressContent}>
+                                    <h3>Progress Points</h3>
+                                    <p className={styles.progressCount}>{performance.progressPoints}</p>
                                 </div>
                             </div>
                         </div>
-                        <div className={styles.attendanceTotal}>
-                            <span>Total Attendance Records: {attendanceSummary.total || 0}</span>
+                        <div className={styles.progressPercentage}>
+                            <span>Overall Progress: {performance.progressPercentage}%</span>
+                            <div className={styles.progressBarBackground}>
+                                <div
+                                    className={styles.progressBarFill}
+                                    style={{ width: `${performance.progressPercentage}%` }}
+                                />
+                            </div>
                         </div>
                     </div>
                 )}
 
-                {/* CONTENT */}
+                {/* CONTENT GRID */}
                 <div className={styles.contentGrid}>
                     <div className={styles.leftColumn}>
                         {/* Personal Information Card */}
@@ -485,68 +473,10 @@ export default function StudentDetail() {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Task Limit Card */}
-                        <div className={styles.card}>
-                            <div className={styles.cardHeader}>
-                                <h2 className={styles.cardTitle}><FaTasks /> Task Limit</h2>
-                                <button
-                                    className={styles.editLimitBtn}
-                                    onClick={() => navigate(`/admin/student/edit/${id}/`)}
-                                >
-                                    <FaEdit /> Edit
-                                </button>
-                            </div>
-                            <div className={styles.taskLimitDisplay}>
-                                <div className={styles.taskLimitValue}>{taskLimit}</div>
-                                <p className={styles.taskLimitDescription}>
-                                    Maximum number of tasks this student can be assigned.
-                                </p>
-                            </div>
-                        </div>
                     </div>
 
                     <div className={styles.rightColumn}>
-                        {/* Learning Tasks Summary */}
-                        {student.learning_tasks && (
-                            <div className={styles.card}>
-                                <div className={styles.cardHeader}>
-                                    <h2 className={styles.cardTitle}><FaTasks /> Learning Tasks Summary</h2>
-                                    <button
-                                        className={styles.viewAllBtn}
-                                        onClick={() => navigate(`/admin/student/task/${id}`)}
-                                    >
-                                        View All Tasks
-                                    </button>
-                                </div>
-                                <div className={styles.learningTasksGrid}>
-                                    <div className={styles.learningTaskItem}>
-                                        <div className={styles.learningTaskIcon}>
-                                            <MdAssignment />
-                                        </div>
-                                        <div className={styles.learningTaskContent}>
-                                            <h3>Total Tasks Created</h3>
-                                            <p className={styles.learningTaskNumber}>
-                                                {student.learning_tasks.total_created || 0}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className={styles.learningTaskItem}>
-                                        <div className={styles.learningTaskIcon}>
-                                            <FaStar />
-                                        </div>
-                                        <div className={styles.learningTaskContent}>
-                                            <h3>Admin Rating + Bonus</h3>
-                                            <p className={styles.learningTaskNumber}>
-                                                {student.learning_tasks.total_admin_rating_plus_bonus || 0}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-    
+                        {/* You can add other cards here if needed, but the Recent Activities card has been removed */}
                     </div>
                 </div>
             </SideBar>

@@ -23,7 +23,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from management.models import Setting
-
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 
 IS_TWOFA_MANDATORY = settings.IS_TWOFA_MANDATORY
 BASE_URL = settings.BASE_URL
@@ -470,92 +472,123 @@ class RegisterView(APIView):
     def post(self, request):
         email = request.data.get("email", "").strip()
         full_name = request.data.get("full_name", "").strip()
+        grade = str(request.data.get("grade", "")).strip().upper()
+        section = request.data.get("section", "").strip()
+        phone_number = request.data.get("phone_number", "").strip()
         password = request.data.get("password", "").strip()
 
-        # Validate required fields
+        # -------------------------
+        # Required fields validation
+        # -------------------------
         if not email or not full_name or not password:
             return Response(
                 {"error": "Email, full name and password are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-        # Check if email already exists
+        # -------------------------
+        # Check duplicate email
+        # -------------------------
         if User.objects.filter(email=email).exists():
             return Response(
                 {"error": "Email already registered."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Create user
+        # -------------------------
+        # Email format validation
+        # -------------------------
+
         try:
-            user = User.objects.create_user(
-                email=email,
-                full_name=full_name,
-                password=password,
-            )
-        except Exception:
+            validate_email(email)
+        except ValidationError:
             return Response(
-                {"error": "Something went wrong while creating the account."},
+                {"error": "Invalid email format."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Remove old verification codes
-        VerifyEmail.objects.filter(user=user).delete()
-
-        # Create verification code
-        email_verif = VerifyEmail.objects.create(user=user)
-
-        html_content = f"""
-        <div style="max-width:600px;margin:40px auto;background:#ffffff;
-            border-radius:8px;font-family:Arial, Helvetica, sans-serif;
-            box-shadow:0 4px 10px rgba(0,0,0,0.1);
-            overflow:hidden;border:1px solid #e5e7eb;">
-
-            <div style="background:#4f46e5;color:#ffffff;padding:20px;text-align:center;">
-                <h2 style="margin:0;font-weight:600;">CSSS IT Club</h2>
-            </div>
-
-            <div style="padding:30px;color:#1f2937;">
-                <p>Hello <strong>{user.full_name}</strong> 👋,</p>
-
-                <p>Welcome! Please verify your email using the code below:</p>
-
-                <div style="margin:24px 0;text-align:center;font-size:28px;
-                    font-weight:bold;letter-spacing:4px;color:#4f46e5;
-                    background:#eef2ff;padding:14px 0;border-radius:6px;">
-                    {email_verif.code}
-                </div>
-
-                <div style="margin-top:20px;padding:12px 14px;
-                    background:rgba(71, 45, 55, 0.3);
-                    border-left:4px solid #dc2626;border-radius:4px;
-                    font-size:14px;">
-                    <strong style="color:#dc2626;">⚠️ Important:</strong>
-                    Do not share this verification code with anyone.
-                </div>
-
-                <p style="margin-top:26px;">
-                    Regards,<br><strong>CSSS IT Club</strong>
-                </p>
-            </div>
-
-            <div style="background:#f9fafb;padding:12px;text-align:center;
-                font-size:12px;color:#6b7280;border-top:1px solid #e5e7eb;">
-                If you did not request this email, you can safely ignore it.
-            </div>
-        </div>
-        """
+        # -------------------------
+        # Password validation
+        # -------------------------
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            return Response(
+                {"error": list(e.messages)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
-            send_email(
-                to_email=email,
-                subject="Verify your email address",
-                html_content=html_content,
-                sender_name="CSSS IT Club",
-            )
-        except Exception as e:
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    email=email,
+                    full_name=full_name,
+                    password=password,
+                )
+
+                Profile.objects.create(
+                    user=user,
+                    grade=grade,
+                    section=section,
+                    phone_number=phone_number,
+                )
+
+                # Remove old codes
+                VerifyEmail.objects.filter(user=user).delete()
+
+                # Create new verification
+                email_verif = VerifyEmail.objects.create(user=user)
+
+                html_content = f"""
+                <div style="max-width:600px;margin:40px auto;background:#ffffff;
+                    border-radius:8px;font-family:Arial, Helvetica, sans-serif;
+                    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+                    overflow:hidden;border:1px solid #e5e7eb;">
+
+                    <div style="background:#4f46e5;color:#ffffff;padding:20px;text-align:center;">
+                        <h2 style="margin:0;font-weight:600;">CSSS IT Club</h2>
+                    </div>
+
+                    <div style="padding:30px;color:#1f2937;">
+                        <p>Hello <strong>{user.full_name}</strong> 👋,</p>
+
+                        <p>Welcome! Please verify your email using the code below:</p>
+
+                        <div style="margin:24px 0;text-align:center;font-size:28px;
+                            font-weight:bold;letter-spacing:4px;color:#4f46e5;
+                            background:#eef2ff;padding:14px 0;border-radius:6px;">
+                            {email_verif.code}
+                        </div>
+
+                        <div style="margin-top:20px;padding:12px 14px;
+                            background:rgba(71, 45, 55, 0.3);
+                            border-left:4px solid #dc2626;border-radius:4px;
+                            font-size:14px;">
+                            <strong style="color:#dc2626;">⚠️ Important:</strong>
+                            Do not share this verification code with anyone.
+                        </div>
+
+                        <p style="margin-top:26px;">
+                            Regards,<br><strong>CSSS IT Club</strong>
+                        </p>
+                    </div>
+
+                    <div style="background:#f9fafb;padding:12px;text-align:center;
+                        font-size:12px;color:#6b7280;border-top:1px solid #e5e7eb;">
+                        If you did not request this email, you can safely ignore it.
+                    </div>
+                </div>
+                """
+
+                send_email(
+                    to_email=email,
+                    subject="Verify your email address",
+                    html_content=html_content,
+                    sender_name="CSSS IT Club",
+                )
+
+        except Exception:
             return Response(
-                {"error": "Unable to send verification email."},
+                {"error": "Registration failed. Please try again."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

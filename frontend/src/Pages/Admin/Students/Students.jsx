@@ -37,7 +37,7 @@ export default function Students() {
         updatePageTitle("Students")
     }, [])
 
-    const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, attendance_avg: 0 });
+    const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, progress_avg: 0 });
     const [students, setStudents] = useState([]);
     const [pagination, setPagination] = useState({
         current_page: 1,
@@ -49,13 +49,13 @@ export default function Students() {
         search: "",
         grade: "",
         section: "",
-        field: "", // NEW: field filter
+        field: "",
         accountStatus: "",
     });
     const [filterOptions, setFilterOptions] = useState({
         grades: [],
         sections: [],
-        fields: [], // NEW: field options
+        fields: [],
     });
     const [sortConfig, setSortConfig] = useState({
         sort_by: "-user__date_joined",
@@ -94,8 +94,9 @@ export default function Students() {
 
             const response = await api.get("/api/management/students/", { params });
             const data = response.data;
+            console.log(data)
 
-            setStats(data.stats || { total: 0, active: 0, inactive: 0, attendance_avg: 0 });
+            setStats(data.stats || { total: 0, active: 0, inactive: 0, progress_avg: 0 });
             setStudents(data.students || []);
             setPagination(data.pagination || {
                 current_page: 1,
@@ -154,7 +155,7 @@ export default function Students() {
             search: "",
             grade: "",
             section: "",
-            field: "", // NEW: clear field
+            field: "",
             accountStatus: "",
         });
         setSortConfig({
@@ -171,7 +172,7 @@ export default function Students() {
             if (filters.search) params.append("search", filters.search);
             if (filters.grade) params.append("grade", filters.grade);
             if (filters.section) params.append("section", filters.section);
-            if (filters.field) params.append("field", filters.field); // NEW
+            if (filters.field) params.append("field", filters.field);
             if (filters.accountStatus) params.append("account_status", filters.accountStatus);
 
             const response = await api.get("/api/management/students/export/", {
@@ -204,7 +205,7 @@ export default function Students() {
             if (filters.search) params.append("search", filters.search);
             if (filters.grade) params.append("grade", filters.grade);
             if (filters.section) params.append("section", filters.section);
-            if (filters.field) params.append("field", filters.field); // NEW
+            if (filters.field) params.append("field", filters.field);
             if (filters.accountStatus) params.append("account_status", filters.accountStatus);
 
             const response = await api.get("/api/management/students/grade/export/", {
@@ -239,8 +240,8 @@ export default function Students() {
         return null;
     };
 
-    const getAttendanceRatingColor = (rating) => {
-        switch (rating) {
+    const getProgressRatingColor = (rating) => {
+        switch (rating?.toLowerCase()) {
             case "excellent": return "#10b981";
             case "good": return "#3b82f6";
             case "average": return "#f59e0b";
@@ -339,8 +340,8 @@ export default function Students() {
                             <FaCalendarAlt className={styles.statIcon} />
                         </div>
                         <div className={styles.statContent}>
-                            <h3>Attendance Avg</h3>
-                            <p className={styles.statValue}>{(stats?.attendance_avg || 0).toFixed(2)}%</p>
+                            <h3>Progress Avg</h3>
+                            <p className={styles.statValue}>{(stats?.progress_avg || 0).toFixed(2)}%</p>
                         </div>
                     </div>
                 </div>
@@ -425,7 +426,6 @@ export default function Students() {
                                         ))}
                                     </select>
                                 </div>
-                                {/* NEW Field filter */}
                                 <div className={styles.filterGroup}>
                                     <label>Field</label>
                                     <select
@@ -496,11 +496,10 @@ export default function Students() {
                                             <th onClick={() => handleSort("section")} className={`${styles.sortable} ${styles.hideOnMobile}`}>
                                                 Section {getSortIcon("section")}
                                             </th>
-                                            {/* NEW Field column */}
                                             <th onClick={() => handleSort("field")} className={`${styles.sortable} ${styles.hideOnMobile}`}>
                                                 Field {getSortIcon("field")}
                                             </th>
-                                            <th>Attendance</th>
+                                            <th>Progress</th>
                                             <th onClick={() => handleSort("account_status")} className={styles.sortable}>
                                                 Status {getSortIcon("account_status")}
                                             </th>
@@ -539,37 +538,36 @@ export default function Students() {
                                                     </span>
                                                 </td>
                                                 <td className={styles.hideOnMobile}>{student.section || 'N/A'}</td>
-                                                {/* NEW Field cell */}
                                                 <td className={styles.hideOnMobile}>
                                                     <span className={styles.fieldBadge}>
                                                         <FaCode className={styles.fieldIcon} /> {student.field || 'N/A'}
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <div className={styles.attendanceCell}>
-                                                        <div className={styles.attendanceProgress}>
-                                                            <div className={styles.progressBar} title={`${student.attendance?.attendance_percentage || 0}%`}>
+                                                    <div className={styles.progressCell}>
+                                                        <div className={styles.progressBarContainer}>
+                                                            <div className={styles.progressBar} title={`${student.progress?.progress_percentage || 0}%`}>
                                                                 <div
                                                                     className={styles.progressFill}
                                                                     style={{
-                                                                        width: `${Math.min(student.attendance?.attendance_percentage || 0, 100)}%`,
-                                                                        backgroundColor: getAttendanceRatingColor(student.attendance?.attendance_rating)
+                                                                        width: `${Math.min(student.progress?.progress_percentage || 0, 100)}%`,
+                                                                        backgroundColor: getProgressRatingColor(student.progress?.progress_rating)
                                                                     }}
                                                                 />
                                                             </div>
-                                                            <span className={styles.attendancePercentage}>
-                                                                {student.attendance?.attendance_percentage || 0}%
+                                                            <span className={styles.progressPercentage}>
+                                                                {student.progress?.progress_percentage || 0}%
                                                             </span>
                                                         </div>
-                                                        <div className={styles.attendanceRating}>
+                                                        <div className={styles.progressRating}>
                                                             <span
                                                                 className={styles.ratingBadge}
                                                                 style={{
-                                                                    backgroundColor: `${getAttendanceRatingColor(student.attendance?.attendance_rating)}20`,
-                                                                    color: getAttendanceRatingColor(student.attendance?.attendance_rating)
+                                                                    backgroundColor: `${getProgressRatingColor(student.progress?.progress_rating)}20`,
+                                                                    color: getProgressRatingColor(student.progress?.progress_rating)
                                                                 }}
                                                             >
-                                                                {student.attendance?.attendance_rating || 'No data'}
+                                                                {student.progress?.progress_rating || 'No data'}
                                                             </span>
                                                         </div>
                                                     </div>
