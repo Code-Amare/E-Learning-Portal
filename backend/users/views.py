@@ -26,6 +26,10 @@ from management.models import Setting
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
+from courses.models import UserCourseProgress, Course
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Count, Q
 
 IS_TWOFA_MANDATORY = settings.IS_TWOFA_MANDATORY
 BASE_URL = settings.BASE_URL
@@ -1157,95 +1161,146 @@ class UserDashboardView(APIView):
     authentication_classes = [JWTCookieAuthentication]
     permission_classes = [IsAuthenticated]
 
-    # def get(self, request):
-    #     user = request.user
+    def get(self, request):
+        user = request.user
 
-    #     tasks = LearningTask.objects.filter(user=user)
-    #     total_tasks = tasks.count()
-    #     rated_tasks = tasks.filter(status="rated").count()
-    #     under_review_tasks = tasks.filter(status="under_review").count()
-    #     draft_tasks = tasks.filter(status="draft").count()
-    #     redo_tasks = tasks.filter(status="redo").count()
+        # Get all course progress for the user
+        user_progress = UserCourseProgress.objects.filter(user=user)
+        total_courses = user_progress.count()
 
-    #     # Compute total grade = sum of all admin task reviews + all bonuses
-    #     total_admin_reviews = (
-    #         TaskReview.objects.filter(task__user=user, is_admin=True)
-    #         .aggregate(total=Sum("rating"))
-    #         .get("total")
-    #         or 0
-    #     )
+        # Count by status
+        started_courses = user_progress.filter(
+            status=UserCourseProgress.STATUS_STARTED
+        ).count()
+        finished_courses = user_progress.filter(
+            status=UserCourseProgress.STATUS_FINISHED
+        ).count()
 
-    #     total_bonus = (
-    #         TaskBonus.objects.filter(task__user=user)
-    #         .aggregate(total=Sum("score"))
-    #         .get("total")
-    #         or 0
-    #     )
+        # Calculate completion rate
+        completion_rate = (
+            round((finished_courses / total_courses) * 100, 1) if total_courses else 0
+        )
 
-    #     total_grade = total_admin_reviews + total_bonus
+        # Courses in progress (started but not finished)
+        in_progress = user_progress.filter(
+            status=UserCourseProgress.STATUS_STARTED
+        ).select_related("course")
 
-    #     task_completion = (
-    #         round((rated_tasks / total_tasks) * 100, 1) if total_tasks else 0
-    #     )
+        # Recently finished courses (last 30 days)
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        recent_finished = user_progress.filter(
+            status=UserCourseProgress.STATUS_FINISHED, finished_at__gte=thirty_days_ago
+        ).count()
 
-    #     # Attendance stats
-    #     attendance_qs = Attendance.objects.filter(user=user)
-    #     present_count = attendance_qs.filter(status="present").count()
-    #     late_count = attendance_qs.filter(status="late").count()
-    #     absent_count = attendance_qs.filter(status="absent").count()
-    #     special_case_count = attendance_qs.filter(status="special_case").count()
-    #     total_attendance = attendance_qs.count()
-    #     attendance_rate = (
-    #         round(((present_count + late_count) / total_attendance) * 100, 1)
-    #         if total_attendance
-    #         else 0
-    #     )
+        # Course distribution by field
+        field_distribution = []
+        courses_by_field = (
+            Course.objects.filter(user_progress__user=user)
+            .values("field")
+            .annotate(count=Count("id"))
+            .order_by("field")
+        )
 
-    #     # Task status distribution for frontend chart
-    #     task_status_distribution = {
-    #         "draft": draft_tasks,
-    #         "redo": redo_tasks,
-    #         "under_review": under_review_tasks,
-    #         "rated": rated_tasks,
-    #     }
+        for item in courses_by_field:
+            field_distribution.append(
+                {
+                    "field": item["field"],
+                    "label": dict(Course.FIELD_CHOICE).get(
+                        item["field"], item["field"]
+                    ),
+                    "count": item["count"],
+                }
+            )
 
-    #     # Recently reviewed tasks
-    #     recent_tasks = tasks.filter(status="rated").order_by("-updated_at")[:5]
-    #     recently_reviewed_tasks = []
-    #     for task in recent_tasks:
-    #         review = task.reviews.order_by("-created_at").first()
-    #         recently_reviewed_tasks.append(
-    #             {
-    #                 "id": task.id,
-    #                 "title": task.title,
-    #                 "description": task.description,
-    #                 "languages": [l.name for l in task.languages.all()],
-    #                 "frameworks": [f.name for f in task.frameworks.all()],
-    #                 "grade": review.rating if review else None,
-    #                 "admin_feedback": review.feedback if review else "",
-    #                 "reviewed_date": task.updated_at.date(),
-    #                 "reviewer": review.user.full_name if review else "Admin",
-    #             }
-    #         )
+        # Recently started courses (last 5)
+        recent_started = []
+        recent_progress = user_progress.order_by("-started_at")[:5]
+        for progress in recent_progress:
+            recent_started.append(
+                {
+                    "id": progress.id,
+                    "course_id": progress.course.id,
+                    "course_title": progress.course.title,
+                    "course_field": progress.course.field,
+                    "field_label": dict(Course.FIELD_CHOICE).get(
+                        progress.course.field, progress.course.field
+                    ),
+                    "status": progress.status,
+                    "started_at": (
+                        progress.started_at.date() if progress.started_at else None
+                    ),
+                    "finished_at": (
+                        progress.finished_at.date() if progress.finished_at else None
+                    ),
+                    "short_note": progress.course.short_note,
+                }
+            )
 
-    #     return Response(
-    #         {
-    #             "stats": {
-    #                 "attendance_rate": attendance_rate,
-    #                 "attendance_distribution": {
-    #                     "present": present_count,
-    #                     "late": late_count,
-    #                     "absent": absent_count,
-    #                     "special_case": special_case_count,
-    #                 },
-    #                 "total_learning_tasks": total_tasks,
-    #                 "total_grade": total_grade,  # NEW: sum of admin reviews + bonuses
-    #                 "task_completion_percent": task_completion,
-    #                 "total_bonus": total_bonus,
-    #                 "task_score": rated_tasks * 5,
-    #             },
-    #             "task_status_distribution": task_status_distribution,
-    #             "recently_reviewed_tasks": recently_reviewed_tasks,
-    #         },
-    #         status=200,
-    #     )
+        # Course recommendations (courses user hasn't started yet, by field preference)
+        completed_fields = (
+            Course.objects.filter(
+                user_progress__user=user,
+                user_progress__status=UserCourseProgress.STATUS_FINISHED,
+            )
+            .values_list("field", flat=True)
+            .distinct()
+        )
+
+        # Find courses user hasn't started, prioritize by fields they've shown interest in
+        user_course_ids = user_progress.values_list("course_id", flat=True)
+
+        recommended_courses = Course.objects.exclude(id__in=user_course_ids).order_by(
+            "-created_at"
+        )[:5]
+
+        recommendations = []
+        for course in recommended_courses:
+            recommendations.append(
+                {
+                    "id": course.id,
+                    "title": course.title,
+                    "short_note": course.short_note,
+                    "field": course.field,
+                    "field_label": dict(Course.FIELD_CHOICE).get(
+                        course.field, course.field
+                    ),
+                    "youtube_link": course.youtube_link,
+                }
+            )
+
+        # Weekly activity (courses started/finished per day for last 7 days)
+        weekly_activity = []
+        for i in range(6, -1, -1):
+            day = timezone.now().date() - timedelta(days=i)
+            started = user_progress.filter(started_at__date=day).count()
+            finished = user_progress.filter(finished_at__date=day).count()
+            weekly_activity.append(
+                {
+                    "date": day.strftime("%Y-%m-%d"),
+                    "day_name": day.strftime("%A"),
+                    "started": started,
+                    "finished": finished,
+                }
+            )
+
+        return Response(
+            {
+                "stats": {
+                    "total_courses": total_courses,
+                    "started_courses": started_courses,
+                    "finished_courses": finished_courses,
+                    "completion_rate": completion_rate,
+                    "recent_finished_30d": recent_finished,
+                    "in_progress_count": in_progress.count(),
+                },
+                "status_distribution": {
+                    "started": started_courses,
+                    "finished": finished_courses,
+                },
+                "field_distribution": field_distribution,
+                "recent_activity": recent_started,
+                "recommendations": recommendations,
+                "weekly_activity": weekly_activity,
+            },
+            status=status.HTTP_200_OK,
+        )
