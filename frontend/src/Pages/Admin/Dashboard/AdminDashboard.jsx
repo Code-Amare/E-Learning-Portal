@@ -98,6 +98,7 @@ const AdminDashboard = () => {
         try {
             const dashboardRes = await api.get("/api/management/dashboard/");
             const data = dashboardRes.data;
+            console.log(data)
 
             setDashboardData({
                 gender_counts: data.gender_counts || { male: 0, female: 0 },

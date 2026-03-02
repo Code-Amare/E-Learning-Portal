@@ -53,10 +53,6 @@ export default function SideBar({ children }) {
         { icon: <MdDashboard />, text: "Dashboard", to: `/${role}` },
         { icon: <MdPeople />, text: "Students", to: "/admin/students" },
         { icon: <MdSchool />, text: "Learning Tasks", to: "/admin/learning-tasks" },
-        { icon: <MdCode />, text: "Languages", to: "/admin/languages" },
-        { icon: <MdAccountTree />, text: "Frameworks", to: "/admin/frameworks" },
-        { icon: <FaBullhorn size={25} />, text: "Announcements", to: "/admin/announcements" },
-        { icon: <MdChecklist />, text: "Attendance", to: "/admin/attendance" },
         { icon: <MdSelectAll />, text: "Bulk Operation", to: "/admin/students/bulk-operation" },
         { icon: <MdAdminPanelSettings />, text: "Admins", to: "/admin/staff" },
     ];
