@@ -15,6 +15,9 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_protect
 
 
+User = get_user_model()
+
+
 class GetCourseView(APIView):
     authentication_classes = [JWTCookieAuthentication]
 
@@ -158,3 +161,35 @@ class UserCourseProgressView(APIView):
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserCourseView(APIView):
+    authentication_classes = [JWTCookieAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "User doesn't exist"}, status=status.HTTP_404_NOT_FOUND
+            )
+        courses_taken = UserCourseProgress.objects.filter(user=user)
+        courses_taken_serializer = UserCourseProgressSerializer(
+            courses_taken, many=True
+        )
+        started_courses_serializer = UserCourseProgressSerializer(
+            courses_taken.filter(status="started"), many=True
+        )
+        finished_courses_serializer = UserCourseProgressSerializer(
+            courses_taken.filter(status="finished"), many=True
+        )
+
+        return Response(
+            {
+                "courses_taken_serializer": courses_taken_serializer.data,
+                "started_courses_serializer": started_courses_serializer.data,
+                "finished_courses_serializer": finished_courses_serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )

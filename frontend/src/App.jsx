@@ -34,6 +34,7 @@ import CreateCourse from './Pages/Admin/CreateCourse/CreateCourse'
 import Courses from './Pages/Admin/Courses/Courses'
 import CourseDetail from './Pages/Admin/CourseDetail/CourseDetail'
 import CourseEdit from './Pages/Admin/CourseEdit/CourseEdit'
+import StudentCourses from "./Pages/Admin/StudentCourses/StudentCourses"
 
 function App() {
   return (
@@ -79,6 +80,7 @@ function App() {
           <Route path="/admin/courses" element={<Courses />} />
           <Route path="/admin/courses/:id" element={<CourseDetail />} />
           <Route path="/admin/courses/edit/:id" element={<CourseEdit />} />
+          <Route path="/admin/student/courses/:userId" element={<StudentCourses />} />
         </Route>
 
         <Route element={<ProtectedRoute requiredRole={["user"]} />}>

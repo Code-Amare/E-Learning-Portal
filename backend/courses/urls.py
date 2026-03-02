@@ -6,6 +6,7 @@ from .views import (
     CourseOperationView,
     CourseOperationView,
     UserCourseProgressView,
+    UserCourseView,
 )
 
 urlpatterns = [
@@ -30,4 +31,5 @@ urlpatterns = [
         UserCourseProgressView.as_view(),
         name="course-progress",
     ),
+    path("user/<int:user_id>/", UserCourseView.as_view(), name="student-courses"),
 ]
