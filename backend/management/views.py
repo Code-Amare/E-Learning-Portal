@@ -17,7 +17,7 @@ from users.models import Profile
 from users.serializers import UserSerializer, ProfileSerializer, UserInverseSerializer
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from .serializers import LanguageSerializer, FrameworkSerializer, SettingSerializer
+from .serializers import SettingSerializer
 import io
 from .models import Setting
 from django.utils.decorators import method_decorator
