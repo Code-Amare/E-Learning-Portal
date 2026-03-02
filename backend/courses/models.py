@@ -54,27 +54,5 @@ class UserCourseProgress(models.Model):
             )
         ]
 
-    def save(self, *args, **kwargs):
-        # Prevent reverting from finished → started
-        if self.pk:
-            old = UserCourseProgress.objects.get(pk=self.pk)
-            if (
-                old.status == self.STATUS_FINISHED
-                and self.status == self.STATUS_STARTED
-            ):
-                raise ValidationError("Cannot revert a finished course.")
-
-        # Auto-set timestamps properly
-        if self.status == self.STATUS_STARTED and not self.started_at:
-            self.started_at = timezone.now()
-
-        if self.status == self.STATUS_FINISHED:
-            if not self.started_at:
-                self.started_at = timezone.now()
-            if not self.finished_at:
-                self.finished_at = timezone.now()
-
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.user.username} - {self.course.title} ({self.status})"

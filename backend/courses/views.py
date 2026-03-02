@@ -9,6 +9,10 @@ from .models import Course, UserCourseProgress
 from .serializers import CourseSerializer, UserCourseProgressSerializer
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_protect
 
 
 class GetCourseView(APIView):
@@ -89,38 +93,67 @@ class CourseOperationView(APIView):
         )
 
 
-class ProgressMarkerView(APIView):
-    authentication_classes = [JWTCookieAuthentication]
+class UserCourseProgressView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        serializer = UserCourseProgressSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(
-                {"errors": serializer.errors},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        course = serializer.validated_data["course"]
-        status_value = serializer.validated_data["status"]
+    def get(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
 
         progress, created = UserCourseProgress.objects.get_or_create(
             user=request.user,
             course=course,
+            defaults={
+                "status": UserCourseProgress.STATUS_STARTED,
+                "started_at": timezone.now(),
+            },
         )
 
-        progress.status = status_value
+        serializer = UserCourseProgressSerializer(progress)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        try:
-            progress.save()  # Model enforces rules
-        except ValidationError as e:
+    def post(self, request, course_id):
+        """
+        Update course status (started / finished)
+        Automatically manages started_at and finished_at
+        """
+
+        course = get_object_or_404(Course, id=course_id)
+
+        progress, created = UserCourseProgress.objects.get_or_create(
+            user=request.user,
+            course=course,
+            defaults={
+                "status": UserCourseProgress.STATUS_STARTED,
+                "started_at": timezone.now(),
+            },
+        )
+
+        serializer = UserCourseProgressSerializer(
+            progress,
+            data=request.data,
+            partial=True,
+        )
+
+        if serializer.is_valid():
+            instance = serializer.save()
+
+            # Ensure started_at is set if not already
+            if not instance.started_at:
+                instance.started_at = timezone.now()
+
+            # Handle status logic
+            if instance.status == UserCourseProgress.STATUS_FINISHED:
+                if not instance.finished_at:
+                    instance.finished_at = timezone.now()
+            else:
+                # If status changed back to "started"
+                instance.finished_at = None
+
+            instance.save()
+
             return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST,
+                UserCourseProgressSerializer(instance).data,
+                status=status.HTTP_200_OK,
             )
 
-        return Response(
-            UserCourseProgressSerializer(progress).data,
-            status=status.HTTP_200_OK,
-        )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
