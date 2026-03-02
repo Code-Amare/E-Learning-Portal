@@ -21,10 +21,10 @@ def send_email(
     sender_email: str = None,
 ):
 
-    sender_email = sender_email or env("EMAIL_HOST_USER")
+    sender_email = sender_email or env("EMAIL")
     if not sender_email:
         raise ValueError(
-            "EMAIL_HOST_USER must be set in environment variables or passed to the function"
+            "EMAIL must be set in environment variables or passed to the function"
         )
 
     api_key = env("BREVO_API_KEY")

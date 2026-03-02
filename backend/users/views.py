@@ -406,7 +406,8 @@ class LoginView(APIView):
                 html_content=html_content,
                 sender_name="CSSS IT Club",
             )
-        except Exception:
+        except Exception as e:
+            print(str(e))
             return Response(
                 {
                     "error": "Unable to send the verification code.",
@@ -552,7 +553,7 @@ class RegisterView(APIView):
                 html_content=html_content,
                 sender_name="CSSS IT Club",
             )
-        except Exception:
+        except Exception as e:
             return Response(
                 {"error": "Unable to send verification email."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -630,9 +631,18 @@ class UserDeleteView(APIView):
     def delete(self, request):
         try:
             user = request.user
-            user.is_delete = True
+            user.delete()
 
-            user.save()
+            response = Response(
+                {"message": f"'{user.full_name}' deleted successfully"},
+                status=status.HTTP_200_OK,
+            )
+
+            response.delete_cookie("access")
+            response.delete_cookie("refresh")
+            response.delete_cookie("csrftoken")
+            return response
+
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

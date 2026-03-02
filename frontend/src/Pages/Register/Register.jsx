@@ -38,7 +38,7 @@ const Register = () => {
             );
 
             neonToast.success("Registration successful! Verification email sent.");
-            user.getUser();
+
             navigate(`/verify-email/?email=${email}`);
 
         } catch (err) {

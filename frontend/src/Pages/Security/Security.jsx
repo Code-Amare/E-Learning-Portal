@@ -5,6 +5,7 @@ import api from "../../Utils/api";
 import { neonToast } from "../../Components/NeonToast/NeonToast";
 import AsyncButton from "../../Components/AsyncButton/AsyncButton";
 import SideBar from "../../Components/SideBar/SideBar";
+import ConfirmAction from "../../Components/ConfirmAction/ConfirmAction"; // ✅ Import ConfirmAction
 import styles from "./Security.module.css";
 import {
     FaShieldAlt,
@@ -19,14 +20,15 @@ import {
     FaUnlock,
     FaEnvelope,
     FaRedo,
-    FaSpinner
+    FaSpinner,
+    FaTrashAlt,
 } from "react-icons/fa";
 import { MdSecurity, MdWarning, MdEmail } from "react-icons/md";
 import { IoShieldCheckmark } from "react-icons/io5";
 import { useNotifContext } from "../../Context/NotifContext";
 
 export default function Security() {
-    const { user, refreshUser } = useUser();
+    const { user, refreshUser, logout } = useUser();
     const navigate = useNavigate();
     const { updatePageTitle } = useNotifContext()
     useEffect(() => {
@@ -41,6 +43,8 @@ export default function Security() {
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [deleteConfirmation, setDeleteConfirmation] = useState("");
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const [passwordForm, setPasswordForm] = useState({
         current_password: "",
@@ -62,6 +66,30 @@ export default function Security() {
             return;
         }
     }, [user, navigate]);
+
+    // ✅ Updated delete handler: accepts (event, reason) from ConfirmAction
+    const handleDeleteAccount = async (e, reason) => {
+        const expectedName = user.fullName || user.username || user.email;
+        // Safety check – button is disabled when mismatch, but guard anyway
+        if (deleteConfirmation !== expectedName) return;
+
+        setDeleteLoading(true);
+        try {
+            // Send user_id in the request body (adjust endpoint/method as needed)
+            await api.delete("/api/users/delete/", { user_id: user.id });
+            logout();
+            neonToast.success("Your account has been permanently deleted.", "success");
+            // Redirect to login or home page after deletion
+            navigate("/login");
+        } catch (err) {
+            const errorMessage = err.response?.data?.error ||
+                err.response?.data?.detail ||
+                "Failed to delete account. Please try again.";
+            neonToast.error(errorMessage, "error");
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
 
     const toggle2FA = async () => {
         setTwoFaLoading(true);
@@ -529,6 +557,70 @@ export default function Security() {
                                 <div className={styles.tipContent}>
                                     <h3>Logout from Shared Devices</h3>
                                     <p>Always logout when using public or shared computers.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Delete Account Card - Danger Zone (with ConfirmAction) */}
+                    <div className={`${styles.card} ${styles.dangerCard}`}>
+                        <div className={styles.cardHeader}>
+                            <h2>
+                                <FaTrashAlt className={styles.cardIcon} />
+                                Delete Account
+                            </h2>
+                            <div className={`${styles.statusBadge} ${styles.dangerBadge}`}>Danger Zone</div>
+                        </div>
+
+                        <div className={styles.cardContent}>
+                            <div className={styles.settingRow}>
+                                <div className={styles.settingInfo}>
+                                    <div className={styles.settingIcon}>
+                                        <MdWarning />
+                                    </div>
+                                    <div>
+                                        <h3>Permanently delete your account</h3>
+                                        <p>
+                                            Once you delete your account, there is no going back. Please be certain.
+                                            All your data, including your profile, posts, and settings will be permanently removed.
+                                        </p>
+                                        <div className={styles.deleteWarning}>
+                                            <MdWarning />
+                                            <span>This action cannot be undone.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className={styles.deleteConfirmation}>
+                                <label className={styles.formLabel}>
+                                    Type <strong>{user.fullName || user.username || user.email}</strong> to confirm:
+                                </label>
+                                <div className={styles.deleteInputGroup}>
+                                    <input
+                                        type="text"
+                                        value={deleteConfirmation}
+                                        onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                        placeholder="Enter your full name"
+                                        className={styles.formInput}
+                                    />
+                                    {/* Wrap AsyncButton with ConfirmAction */}
+                                    <ConfirmAction
+                                        title="Delete Account"
+                                        message="Are you absolutely sure you want to delete your account? This action cannot be undone."
+                                        confirmText="Yes, Delete"
+                                        cancelText="Cancel"
+                                        onConfirm={handleDeleteAccount}
+                                    >
+                                        <AsyncButton
+                                            loading={deleteLoading}
+                                            disabled={deleteConfirmation !== (user.fullName || user.username || user.email) || deleteLoading}
+                                            className={styles.dangerBtn}
+                                        >
+                                            <FaTrashAlt />
+                                            <span>Delete Account</span>
+                                        </AsyncButton>
+                                    </ConfirmAction>
                                 </div>
                             </div>
                         </div>

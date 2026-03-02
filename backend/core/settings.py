@@ -38,7 +38,7 @@ environ.Env.read_env(str(BASE_DIR / ".env"))
 SECRET_KEY = env("SECRET_KEY", default="secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG", default=False)
+DEBUG = env.bool("DEBUG", default=True)
 
 
 if DEBUG:
@@ -237,10 +237,12 @@ SESSION_CACHE_ALIAS = "default"
 CSRF_COOKIE_SECURE = True
 CSRF_FAILURE_VIEW = "utils.csrf.csrf_failure_view"
 CORS_ALLOWED_ORIGINS = [
-    "https://csss-it-club-portal.up.railway.app",
+    "https://127.0.0.1:8000",
+    "https://localhost:5173",
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "https://csss-it-club-portal.up.railway.app",
+    "https://127.0.0.1:8000",
+    "https://localhost:5173",
 ]
 
 # SESSION_COOKIE_SECURE = True
@@ -317,7 +319,8 @@ IS_TWOFA_MANDATORY = env.bool("IS_TWOFA_MANDATORY")
 
 # Cors Headers
 CORS_ALLOWED_ORIGINS = [
-    "https://csss-it-club-portal.up.railway.app",
+    "https://127.0.0.1:8000",
+    "https://localhost:5173",
 ]
 
 
