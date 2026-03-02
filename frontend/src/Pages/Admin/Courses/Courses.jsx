@@ -97,6 +97,7 @@ export default function Courses() {
             const response = await api.get("/api/courses/", { params });
             const data = response.data;
 
+
             // Assume response has structure: { courses, pagination, stats, filter_options }
             setCourses(data.courses || []);
             setPagination(data.pagination || {
@@ -107,7 +108,20 @@ export default function Courses() {
             });
             setStats(data.stats || { total: data.pagination?.total_count || 0 });
             setFilterOptions(data.filter_options || { fields: [] });
+
         } catch (error) {
+            if (error?.response?.data?.info) {
+                neonToast.warning("No courses yet")
+                setCourses([]);
+                setPagination({
+                    current_page: 1,
+                    page_size: 10,
+                    total_count: 0,
+                    total_pages: 1,
+                });
+                setStats({ total: data.pagination?.total_count || 0 });
+                setFilterOptions({ fields: [] });
+            }
             console.error("Error fetching courses:", error);
             neonToast.error("Failed to load courses", "error");
         } finally {
@@ -160,10 +174,13 @@ export default function Courses() {
     const handleDelete = async (courseId, courseTitle) => {
         setDeletingId(courseId);
         try {
-            await api.delete(`/api/courses/${courseId}/delete/`);
+            const res = await api.delete(`/api/courses/${courseId}/delete/`);
             neonToast.success("Course deleted successfully", "success");
+
+
             // Refresh list
             fetchCourses(pagination.current_page);
+
         } catch (error) {
             console.error("Delete error:", error);
             if (error.response?.status === 403) {

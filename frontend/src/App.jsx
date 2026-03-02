@@ -32,6 +32,8 @@ import AdminEdit from './Pages/Admin/AdminEdit/AdminEdit'
 import Register from './Pages/Register/Register'
 import CreateCourse from './Pages/Admin/CreateCourse/CreateCourse'
 import Courses from './Pages/Admin/Courses/Courses'
+import CourseDetail from './Pages/Admin/CourseDetail/CourseDetail'
+import CourseEdit from './Pages/Admin/CourseEdit/CourseEdit'
 
 function App() {
   return (
@@ -75,6 +77,8 @@ function App() {
           <Route path="/admin/staff/edit/:id" element={<AdminEdit />} />
           <Route path="/admin/courses/create" element={<CreateCourse />} />
           <Route path="/admin/courses" element={<Courses />} />
+          <Route path="/admin/courses/:id" element={<CourseDetail />} />
+          <Route path="/admin/courses/edit/:id" element={<CourseEdit />} />
         </Route>
 
         <Route element={<ProtectedRoute requiredRole={["user"]} />}>

@@ -24,7 +24,8 @@ class GetCourseView(APIView):
                 course = Course.objects.get(id=course_id)
             except Course.DoesNotExist:
                 return Response(
-                    {"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND
+                    {"error": "Course not found", "no_course": True},
+                    status=status.HTTP_404_NOT_FOUND,
                 )
 
             course_serializer = CourseSerializer(course)

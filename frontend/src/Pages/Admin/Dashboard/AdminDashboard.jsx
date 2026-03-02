@@ -41,22 +41,19 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [dashboardData, setDashboardData] = useState({
-        gender_counts: { male: 0, female: 0 },
-        attendance_summary: {
-            total_sessions: 0,
-            status_counts: { present: 0, late: 0, absent: 0, special_case: 0 },
-            status_percentages: { present: 0, late: 0, absent: 0, special_case: 0 }
-        },
-        grade_distribution: {},
-        top_learning_tasks: [],
         total_students: 0,
+        gender_counts: { male: 0, female: 0 },
+        grade_distribution: {},
+        average_progress_percentage: 0,
+        progress_by_grade: {},
     });
     const { updatePageTitle } = useNotifContext();
     useEffect(() => {
         updatePageTitle("Admin Dashboard");
     }, []);
 
-    const [gradeData, setGradeData] = useState([]);
+    const [gradeCountData, setGradeCountData] = useState([]);
+    const [progressByGradeData, setProgressByGradeData] = useState([]);
     const [genderData, setGenderData] = useState([
         { name: "Male", value: 0, color: "#4f46e5" },
         { name: "Female", value: 0, color: "#ec4899" },
@@ -66,17 +63,7 @@ const AdminDashboard = () => {
         textSecondary: "#4b5563"
     });
 
-    // Calculate total students: use backend value if available, otherwise sum of grade_distribution
-    const totalStudents = dashboardData.total_students ||
-        Object.values(dashboardData.grade_distribution || {}).reduce((sum, count) => sum + count, 0);
-
-    // Calculate attendance average (present + late percentage)
-    const attendanceAverage = (dashboardData.attendance_summary?.status_percentages?.present || 0) +
-        (dashboardData.attendance_summary?.status_percentages?.late || 0);
-
-    const specialCasePercentage = dashboardData.attendance_summary?.status_percentages?.special_case || 0;
-
-    // Fetch all dashboard data
+    // Fetch dashboard data
     useEffect(() => {
         if (user.isAuthenticated === null) return;
         if (!user.isAuthenticated) return;
@@ -98,36 +85,44 @@ const AdminDashboard = () => {
         try {
             const dashboardRes = await api.get("/api/management/dashboard/");
             const data = dashboardRes.data;
-            console.log(data)
+            console.log(data);
 
             setDashboardData({
-                gender_counts: data.gender_counts || { male: 0, female: 0 },
-                attendance_summary: data.attendance_summary || {
-                    total_sessions: 0,
-                    status_counts: { present: 0, late: 0, absent: 0, special_case: 0 },
-                    status_percentages: { present: 0, late: 0, absent: 0, special_case: 0 }
-                },
-                grade_distribution: data.grade_distribution || {},
-                top_learning_tasks: data.top_learning_tasks || [],
                 total_students: data.total_students || 0,
+                gender_counts: data.gender_counts || { male: 0, female: 0 },
+                grade_distribution: data.grade_distribution || {},
+                average_progress_percentage: data.average_progress_percentage || 0,
+                progress_by_grade: data.progress_by_grade || {},
             });
 
-            const gradeChartData = Object.entries(data.grade_distribution || {}).map(([grade, count]) => ({
-                grade: `Grade ${grade}`,
-                students: count
-            })).sort((a, b) => parseInt(a.grade.replace('Grade ', '')) - parseInt(b.grade.replace('Grade ', '')));
-            setGradeData(gradeChartData);
+            // Prepare grade count chart data
+            const gradeCountChart = Object.entries(data.grade_distribution || {})
+                .map(([grade, count]) => ({
+                    grade: `Grade ${grade}`,
+                    students: count,
+                }))
+                .sort((a, b) => parseInt(a.grade.replace('Grade ', '')) - parseInt(b.grade.replace('Grade ', '')));
+            setGradeCountData(gradeCountChart);
 
+            // Prepare progress by grade chart data
+            const progressChart = Object.entries(data.progress_by_grade || {})
+                .map(([grade, avg]) => ({
+                    grade: `Grade ${grade}`,
+                    progress: Number(avg).toFixed(1),
+                }))
+                .sort((a, b) => parseInt(a.grade.replace('Grade ', '')) - parseInt(b.grade.replace('Grade ', '')));
+            setProgressByGradeData(progressChart);
+
+            // Gender pie data (percentage)
             const maleCount = data.gender_counts?.male || 0;
             const femaleCount = data.gender_counts?.female || 0;
             const totalGender = maleCount + femaleCount;
-
             const malePercentage = totalGender > 0 ? (maleCount / totalGender) * 100 : 0;
             const femalePercentage = totalGender > 0 ? (femaleCount / totalGender) * 100 : 0;
 
             setGenderData([
                 { name: "Male", value: Math.round(malePercentage), count: maleCount, color: "#4f46e5" },
-                { name: "Female", value: Math.round(femalePercentage), count: femaleCount, color: "#ec4899" }
+                { name: "Female", value: Math.round(femalePercentage), count: femaleCount, color: "#ec4899" },
             ]);
 
         } catch (error) {
@@ -137,28 +132,6 @@ const AdminDashboard = () => {
             setLoading(false);
         }
     };
-
-    const processedLearningTasks = dashboardData.top_learning_tasks.map(task => {
-        let averageRating = 0;
-        if (task.reviews && task.reviews.length > 0) {
-            averageRating = task.reviews.reduce((sum, review) => sum + review.rating, 0) / task.reviews.length;
-        }
-
-        return {
-            id: task.id,
-            title: task.title || "Untitled Task",
-            student: {
-                fullName: task.user?.full_name || "Unknown Student",
-                grade: task.profile?.grade || "N/A",
-                profile_pic_url: task.user?.profile_pic_url || null,
-            },
-            rating: averageRating,
-            likes_count: task.likes_count || 0,
-            languages: task.languages || [],
-            frameworks: task.frameworks || [],
-            status: task.status || "rated"
-        };
-    });
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
@@ -176,37 +149,6 @@ const AdminDashboard = () => {
         return null;
     };
 
-    const handleImageError = (e) => {
-        e.target.style.display = "none";
-        const nextSibling = e.target.nextElementSibling;
-        if (nextSibling) nextSibling.style.display = "flex";
-    };
-
-    const getAttendanceStatusBadge = (status) => {
-        const badges = {
-            present: { icon: <FaCheckCircle />, bgColor: "#10b98120", color: "#10b981", label: "Present" },
-            late: { icon: <FaClock />, bgColor: "#f59e0b20", color: "#f59e0b", label: "Late" },
-            absent: { icon: <FaTimesCircle />, bgColor: "#ef444420", color: "#ef4444", label: "Absent" },
-            special_case: { icon: <FaUserCheck />, bgColor: "#8b5cf620", color: "#8b5cf6", label: "Special Case" }
-        };
-        const badge = badges[status] || badges.absent;
-        return (
-            <span className={styles.statusBadge} style={{ backgroundColor: badge.bgColor, color: badge.color }}>
-                {badge.icon} {badge.label}
-            </span>
-        );
-    };
-
-    const getStatusDescription = (status) => {
-        const descriptions = {
-            present: "Students who attended on time",
-            late: "Students who arrived late",
-            absent: "Students who didn't attend",
-            special_case: "Students with special attendance cases"
-        };
-        return descriptions[status] || "";
-    };
-
     if (loading) {
         return (
             <div className={styles.AdminDashboardContainer}>
@@ -221,7 +163,6 @@ const AdminDashboard = () => {
             </div>
         );
     }
-
 
     return (
         <div className={styles.AdminDashboardContainer}>
@@ -252,23 +193,23 @@ const AdminDashboard = () => {
                                 <FaChartBar className={styles.statIconSvg} />
                             </div>
                             <div className={styles.statContent}>
-                                <h3>Attendance</h3>
-                                <p className={styles.statValue}>{attendanceAverage.toFixed(2)}%</p>
+                                <h3>Avg Progress</h3>
+                                <p className={styles.statValue}>{dashboardData.average_progress_percentage.toFixed(1)}%</p>
                                 <span className={styles.statTrend}>
-                                    <FiTrendingUp /> {dashboardData.attendance_summary?.total_sessions || 0} sessions
+                                    <FiTrendingUp /> across all students
                                 </span>
                             </div>
                         </div>
 
                         <div className={styles.statCard}>
                             <div className={styles.statIcon} style={{ backgroundColor: "rgba(245, 158, 11, 0.1)" }}>
-                                <FaTasks className={styles.statIconSvg} />
+                                <FaGraduationCap className={styles.statIconSvg} />
                             </div>
                             <div className={styles.statContent}>
-                                <h3>Top Tasks</h3>
-                                <p className={styles.statValue}>{processedLearningTasks.length}</p>
+                                <h3>Grade Levels</h3>
+                                <p className={styles.statValue}>{Object.keys(dashboardData.grade_distribution).length}</p>
                                 <span className={styles.statTrend}>
-                                    <FiTrendingUp /> {Math.min(processedLearningTasks.length, 10)} rated
+                                    <FiTrendingUp /> {dashboardData.total_students} students
                                 </span>
                             </div>
                         </div>
@@ -278,10 +219,12 @@ const AdminDashboard = () => {
                                 <FaProjectDiagram className={styles.statIconSvg} />
                             </div>
                             <div className={styles.statContent}>
-                                <h3>Special Cases</h3>
-                                <p className={styles.statValue}>{specialCasePercentage.toFixed(1)}%</p>
+                                <h3>Gender Split</h3>
+                                <p className={styles.statValue}>
+                                    {dashboardData.gender_counts?.male || 0} / {dashboardData.gender_counts?.female || 0}
+                                </p>
                                 <span className={styles.statTrend}>
-                                    <FiTrendingUp /> {dashboardData.attendance_summary?.status_counts?.special_case || 0} students
+                                    <FiTrendingUp /> M/F
                                 </span>
                             </div>
                         </div>
@@ -289,6 +232,7 @@ const AdminDashboard = () => {
 
                     {/* Charts Section */}
                     <div className={styles.chartsSection}>
+                        {/* Grade Distribution (Count) */}
                         <div className={styles.chartCard}>
                             <div className={styles.chartHeader}>
                                 <h2>
@@ -297,7 +241,7 @@ const AdminDashboard = () => {
                                 <p className={styles.chartSubtitle}>Students per Grade Level</p>
                             </div>
                             <div className={styles.chartContainer}>
-                                {gradeData.length === 0 ? (
+                                {gradeCountData.length === 0 ? (
                                     <div className={styles.noDataMessage}>
                                         <FaExclamationTriangle size={24} />
                                         <p>No grade data available</p>
@@ -305,7 +249,7 @@ const AdminDashboard = () => {
                                 ) : (
                                     <ResponsiveContainer width="100%" height={300}>
                                         <BarChart
-                                            data={gradeData}
+                                            data={gradeCountData}
                                             margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                                         >
                                             <CartesianGrid
@@ -335,6 +279,7 @@ const AdminDashboard = () => {
                             </div>
                         </div>
 
+                        {/* Gender Distribution Pie */}
                         <div className={styles.chartCard}>
                             <div className={styles.chartHeader}>
                                 <h2>
@@ -403,179 +348,52 @@ const AdminDashboard = () => {
                         </div>
                     </div>
 
-                    {/* Tables Section - Full width for Learning Tasks */}
-                    <div className={styles.tablesSection}>
-                        {/* Top Learning Tasks Table - Full Width */}
-                        <div className={`${styles.tableCard} ${styles.fullWidth}`}>
-                            <div className={styles.tableHeader}>
+                    {/* Optional: Average Progress by Grade Chart */}
+                    <div className={styles.chartsSection}>
+                        <div className={styles.chartCard} style={{ width: "100%" }}>
+                            <div className={styles.chartHeader}>
                                 <h2>
-                                    <FaTasks className={styles.tableIcon} /> Top Rated Learning Tasks
+                                    <FaChartBar className={styles.chartIcon} /> Average Progress by Grade
                                 </h2>
-                                <span className={styles.badge}>
-                                    {Math.min(processedLearningTasks.length, 10)} Tasks
-                                </span>
+                                <p className={styles.chartSubtitle}>Progress percentage per grade level</p>
                             </div>
-                            <div className={styles.tableWrapper}>
-                                <div className={styles.tableContainer}>
-                                    {processedLearningTasks.length === 0 ? (
-                                        <div className={styles.emptyState}>
-                                            <FaExclamationTriangle size={24} />
-                                            <p>No learning tasks available</p>
-                                            <button
-                                                onClick={fetchDashboardData}
-                                                className={styles.retryButton}
-                                            >
-                                                Retry Loading Tasks
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <table className={styles.dataTable}>
-                                            <thead>
-                                                <tr>
-                                                    <th>Task Name</th>
-                                                    <th className={styles.hideOnMobile}>Student</th>
-                                                    <th>Grade</th>
-                                                    <th>Rating</th>
-                                                    <th className={styles.hideOnMobile}>Likes</th>
-                                                    <th className={styles.hideOnMobile}>Languages</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {processedLearningTasks.map((task) => {
-                                                    const avatarClassName = task.student.profile_pic_url
-                                                        ? `${styles.avatarPlaceholder} ${styles.fallbackAvatar}`
-                                                        : styles.avatarPlaceholder;
-
-                                                    return (
-                                                        <tr key={task.id} className={styles.clickableRow} onClick={() => navigate(`/admin/learning-task/${task.id}`)}>
-                                                            <td>
-                                                                <div className={styles.taskCell}>
-                                                                    <span className={styles.taskName}>{task.title}</span>
-                                                                </div>
-                                                            </td>
-                                                            <td className={styles.hideOnMobile}>
-                                                                <div className={styles.studentCell}>
-                                                                    {task.student.profile_pic_url ? (
-                                                                        <img
-                                                                            src={task.student.profile_pic_url}
-                                                                            alt={task.student.fullName}
-                                                                            className={styles.profileImage}
-                                                                            onError={handleImageError}
-                                                                        />
-                                                                    ) : null}
-                                                                    <div className={avatarClassName}>
-                                                                        {task.student.fullName.charAt(0)}
-                                                                    </div>
-                                                                    <span>{task.student.fullName}</span>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <span className={styles.gradeBadge}>
-                                                                    <FaGraduationCap className={styles.gradeIcon} /> {task.student.grade}
-                                                                </span>
-                                                            </td>
-                                                            <td>
-                                                                <div className={styles.rating}>
-                                                                    <span className={styles.ratingValue}>{task.rating.toFixed(1)}</span>
-                                                                    <div className={styles.stars}>
-                                                                        {[...Array(5)].map((_, i) => (
-                                                                            <FaStar
-                                                                                key={i}
-                                                                                className={`${styles.star} ${i < Math.floor(task.rating) ? styles.starFilled : ""}`}
-                                                                            />
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td className={styles.hideOnMobile}>
-                                                                <div className={styles.likesCount}>
-                                                                    <span className={styles.likesBadge}>
-                                                                        {task.likes_count || 0} <FaHeart className={styles.heartIcon} />
-                                                                    </span>
-                                                                </div>
-                                                            </td>
-                                                            <td className={styles.hideOnMobile}>
-                                                                <div className={styles.languagesContainer}>
-                                                                    {task.languages.slice(0, 3).map((lang, idx) => (
-                                                                        <span
-                                                                            key={lang.id || idx}
-                                                                            className={styles.languageBadge}
-                                                                            style={{ backgroundColor: lang.color || '#4f46e5' }}
-                                                                            title={lang.name}
-                                                                        >
-                                                                            {lang.code || lang.name.substring(0, 2)}
-                                                                        </span>
-                                                                    ))}
-                                                                    {task.languages.length > 3 && (
-                                                                        <span className={styles.moreLanguages}>
-                                                                            +{task.languages.length - 3}
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Attendance Status Table - Full Width */}
-                        <div className={`${styles.tableCard} ${styles.fullWidth}`}>
-                            <div className={styles.tableHeader}>
-                                <h2>
-                                    <FaProjectDiagram className={styles.tableIcon} /> Attendance Status
-                                </h2>
-                                <span className={styles.badge}>
-                                    {dashboardData.attendance_summary?.total_sessions || 0} Sessions
-                                </span>
-                            </div>
-                            <div className={styles.tableWrapper}>
-                                <div className={styles.tableContainer}>
-                                    <table className={styles.dataTable}>
-                                        <thead>
-                                            <tr>
-                                                <th>Status</th>
-                                                <th>Percentage</th>
-                                                <th>Count</th>
-                                                <th>Description</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {['present', 'late', 'absent', 'special_case'].map((status) => {
-                                                const percentage = dashboardData.attendance_summary?.status_percentages?.[status] || 0;
-                                                const count = dashboardData.attendance_summary?.status_counts?.[status] || 0;
-
-                                                return (
-                                                    <tr key={status}>
-                                                        <td>
-                                                            {getAttendanceStatusBadge(status, percentage)}
-                                                        </td>
-                                                        <td>{percentage.toFixed(1)}%</td>
-                                                        <td>{count}</td>
-                                                        <td>{getStatusDescription(status)}</td>
-                                                    </tr>
-                                                );
-                                            })}
-                                            <tr>
-                                                <td>
-                                                    <span className={styles.statusBadge} style={{ backgroundColor: "#4f46e520", color: "#4f46e5" }}>
-                                                        <FaChartBar /> Average Attendance
-                                                    </span>
-                                                </td>
-                                                <td>{attendanceAverage.toFixed(2)}%</td>
-                                                <td>
-                                                    {Object.values(dashboardData.attendance_summary?.status_counts || {})
-                                                        .reduce((sum, count) => sum + count, 0)}
-                                                </td>
-                                                <td>Overall attendance (Present + Late)</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <div className={styles.chartContainer}>
+                                {progressByGradeData.length === 0 ? (
+                                    <div className={styles.noDataMessage}>
+                                        <FaExclamationTriangle size={24} />
+                                        <p>No progress data available</p>
+                                    </div>
+                                ) : (
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <BarChart
+                                            data={progressByGradeData}
+                                            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                                        >
+                                            <CartesianGrid
+                                                strokeDasharray="3 3"
+                                                stroke={cssVars.borderColor}
+                                            />
+                                            <XAxis
+                                                dataKey="grade"
+                                                stroke={cssVars.textSecondary}
+                                                tick={{ fill: cssVars.textSecondary }}
+                                            />
+                                            <YAxis
+                                                stroke={cssVars.textSecondary}
+                                                tick={{ fill: cssVars.textSecondary }}
+                                                domain={[0, 100]}
+                                            />
+                                            <Tooltip content={<CustomTooltip />} />
+                                            <Legend />
+                                            <Bar
+                                                dataKey="progress"
+                                                name="Avg Progress %"
+                                                fill="#10b981"
+                                                radius={[4, 4, 0, 0]}
+                                            />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                )}
                             </div>
                         </div>
                     </div>
