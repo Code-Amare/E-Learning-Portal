@@ -30,6 +30,8 @@ import AddAdmin from './Pages/Admin/AddAdmin/AddAdmin'
 import AdminDetail from './Pages/Admin/AdminDetail/AdminDetail'
 import AdminEdit from './Pages/Admin/AdminEdit/AdminEdit'
 import Register from './Pages/Register/Register'
+import CreateCourse from './Pages/Admin/CreateCourse/CreateCourse'
+import Courses from './Pages/Admin/Courses/Courses'
 
 function App() {
   return (
@@ -71,6 +73,8 @@ function App() {
           <Route path="/admin/staff/add" element={<AddAdmin />} />
           <Route path="/admin/staff/:id" element={<AdminDetail />} />
           <Route path="/admin/staff/edit/:id" element={<AdminEdit />} />
+          <Route path="/admin/courses/create" element={<CreateCourse />} />
+          <Route path="/admin/courses" element={<Courses />} />
         </Route>
 
         <Route element={<ProtectedRoute requiredRole={["user"]} />}>

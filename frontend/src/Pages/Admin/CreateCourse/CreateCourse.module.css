@@ -127,7 +127,7 @@
   border-radius: 8px;
   font-size: 14px;
   color: var(--text-primary);
-  background: var(--bg-input);
+  background: var(--bg-input, var(--bg-surface)); /* fallback for dark mode */
   transition: all 0.2s ease;
 }
 

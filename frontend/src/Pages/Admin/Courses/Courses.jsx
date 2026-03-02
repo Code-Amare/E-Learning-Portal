@@ -94,7 +94,7 @@ export default function Courses() {
                 }
             });
 
-            const response = await api.get("/api/management/courses/", { params });
+            const response = await api.get("/api/courses/", { params });
             const data = response.data;
 
             // Assume response has structure: { courses, pagination, stats, filter_options }
@@ -160,7 +160,7 @@ export default function Courses() {
     const handleDelete = async (courseId, courseTitle) => {
         setDeletingId(courseId);
         try {
-            await api.delete(`/api/management/courses/${courseId}/delete/`);
+            await api.delete(`/api/courses/${courseId}/delete/`);
             neonToast.success("Course deleted successfully", "success");
             // Refresh list
             fetchCourses(pagination.current_page);
@@ -471,8 +471,10 @@ export default function Courses() {
                                     <select
                                         value={pagination.page_size}
                                         onChange={(e) => {
-                                            setPagination((prev) => ({ ...prev, page_size: parseInt(e.target.value) }));
-                                            setTimeout(() => fetchCourses(1), 0);
+                                            const newSize = parseInt(e.target.value);
+                                            setPagination((prev) => ({ ...prev, page_size: newSize }));
+                                            // Directly call fetchCourses without setTimeout
+                                            fetchCourses(1);
                                         }}
                                         disabled={coursesLoading}
                                         className={styles.pageSizeSelect}

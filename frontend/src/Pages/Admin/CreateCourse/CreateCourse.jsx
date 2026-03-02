@@ -100,7 +100,7 @@ export default function CreateCourse() {
         setLoading(true);
         try {
             // POST to the create endpoint
-            const response = await api.post("/api/management/courses/create/", formData);
+            const response = await api.post("/api/courses/create/", formData);
 
             neonToast.success("Course created successfully!", "success");
 

@@ -20,6 +20,8 @@ export default function AdminRoute() {
     return (
         <Routes>
             <Route path="" element={<AdminDashboard />} />
+            <Route path="course/add" element={<CreateCourse />} />
+            <Route path="courses" element={<Courses />} />
             <Route path="students" element={<Students />} />
             <Route path="student/add" element={<StudentAdd />} />
             <Route path="students/bulk" element={<StudentsBulk />} />
@@ -30,8 +32,6 @@ export default function AdminRoute() {
             <Route path="staff/add" element={<AddAdmin />} />
             <Route path="staff/:id" element={<AdminDetail />} />
             <Route path="staff/edit/:id" element={<AdminEdit />} />
-            <Route path="course/add" element={<CreateCourse />} />
-            <Route path="courses" element={<Courses />} />
         </Routes>
     )
 }
