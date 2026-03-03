@@ -35,6 +35,8 @@ import Courses from './Pages/Admin/Courses/Courses'
 import CourseDetail from './Pages/Admin/CourseDetail/CourseDetail'
 import CourseEdit from './Pages/Admin/CourseEdit/CourseEdit'
 import StudentCourses from "./Pages/Admin/StudentCourses/StudentCourses"
+import UserCourses from './Pages/User/UserCourses/UserCourses'
+import UserCourseDetail from './Pages/User/UserCourseDetail/UserCourseDetail'
 
 function App() {
   return (
@@ -85,6 +87,8 @@ function App() {
 
         <Route element={<ProtectedRoute requiredRole={["user"]} />}>
           <Route path='/user' element={<UserDashboard />} />
+          <Route path="/user/courses" element={<UserCourses />} />
+          <Route path="/user/courses/:id" element={<UserCourseDetail />} />
         </Route>
 
         <Route path='*' element={<NotFound />} />

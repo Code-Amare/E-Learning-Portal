@@ -14,17 +14,10 @@ import {
     MdSecurity,
     MdPerson,
     MdDashboard,
-    MdAnalytics,
     MdPeople,
-    MdAssignment,
     MdSchool,
-    MdCode,
-    MdAccountTree,
-    MdChecklist,
-    MdAnnouncement,
     MdAdminPanelSettings,
     MdSelectAll,
-    MdCampaign,
 } from "react-icons/md";
 
 import { FaBullhorn } from "react-icons/fa"
@@ -64,10 +57,10 @@ export default function SideBar({ children }) {
 
     const userMenuItems = [
         { icon: <MdDashboard />, text: "Dashboard", to: `/${role}` },
-        { icon: <MdAssignment />, text: "My Learning Task", to: "/user/my-learning-task" },
-        { icon: <MdSchool />, text: "Learning Tasks", to: "/user/learning-tasks" },
-        { icon: <MdAnnouncement />, text: "Announcements", to: "/user/announcements" },
-        { icon: <MdAnalytics />, text: "Attendance", to: "/user/attendance" },
+        { icon: <MdSchool />, text: "Courses", to: "/user/courses" },
+        { icon: <MdPerson />, text: "Profile", to: "/profile" },
+        { icon: <MdSettings />, text: "Settings", to: "/settings" },
+        { icon: <MdSecurity />, text: "Security", to: "/security" },
     ];
 
     const menuItems = user.role === "admin" ? adminMenuItems : userMenuItems;

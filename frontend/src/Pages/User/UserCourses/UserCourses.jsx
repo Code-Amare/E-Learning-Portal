@@ -38,8 +38,8 @@ export default function UserCourses() {
     const fetchCourses = async () => {
         setLoading(true);
         try {
-            const response = await api.get("/api/courses/");
-            // Assuming the API returns { courses: [...] } or directly an array
+            const response = await api.get("/api/courses/with-progress/");
+            console.log(response.data);
             const coursesData = response.data.courses || response.data;
             setCourses(coursesData);
             setFilteredCourses(coursesData);
@@ -51,7 +51,7 @@ export default function UserCourses() {
         }
     };
 
-    // Helper to extract YouTube thumbnail from a YouTube link
+    // Helper to extract YouTube thumbnail
     const getYouTubeThumbnail = (url) => {
         if (!url) return null;
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -60,14 +60,38 @@ export default function UserCourses() {
         return videoId ? `https://img.youtube.com/vi/${videoId}/0.jpg` : null;
     };
 
+    // Get status info for inline badge
+    const getStatusInfo = (progress) => {
+        if (!progress || progress.status === 'not_started') {
+            return {
+                label: 'New',
+                className: styles.statusNew,
+            };
+        }
+        if (progress.status === 'started') {
+            return {
+                label: 'Started',
+                className: styles.statusStarted,
+            };
+        }
+        if (progress.status === 'finished') {
+            return {
+                label: 'Finished',
+                className: styles.statusFinished,
+            };
+        }
+        return null;
+    };
+
     const handleSearch = (e) => {
         const term = e.target.value.toLowerCase();
         setSearchTerm(term);
         const filtered = courses.filter(
             (course) =>
                 course.title.toLowerCase().includes(term) ||
-                course.short_note.toLowerCase().includes(term) ||
-                course.field.toLowerCase().includes(term)
+                (course.short_note && course.short_note.toLowerCase().includes(term)) ||
+                (course.field && course.field.toLowerCase().includes(term)) ||
+                (course.field_label && course.field_label.toLowerCase().includes(term))
         );
         setFilteredCourses(filtered);
     };
@@ -93,7 +117,6 @@ export default function UserCourses() {
                     <p className={styles.subtitle}>Explore our course catalog</p>
                 </div>
 
-                {/* Search Bar */}
                 <div className={styles.searchContainer}>
                     <div className={styles.searchInputWrapper}>
                         <FaSearch className={styles.searchIcon} />
@@ -107,7 +130,6 @@ export default function UserCourses() {
                     </div>
                 </div>
 
-                {/* Course Grid */}
                 {filteredCourses.length === 0 ? (
                     <div className={styles.emptyState}>
                         <FaExclamationTriangle size={48} />
@@ -118,11 +140,13 @@ export default function UserCourses() {
                     <div className={styles.coursesGrid}>
                         {filteredCourses.map((course) => {
                             const thumbnailUrl = getYouTubeThumbnail(course.youtube_link);
+                            const statusInfo = getStatusInfo(course.progress);
+
                             return (
                                 <div
                                     key={course.id}
                                     className={styles.courseCard}
-                                    onClick={() => navigate(`/courses/${course.id}`)}
+                                    onClick={() => navigate(`/user/courses/${course.id}`)}
                                 >
                                     <div className={styles.thumbnailContainer}>
                                         {thumbnailUrl ? (
@@ -146,8 +170,16 @@ export default function UserCourses() {
                                             <FaBook size={32} />
                                         </div>
                                     </div>
+
                                     <div className={styles.courseInfo}>
-                                        <h3>{course.title}</h3>
+                                        <div className={styles.titleRow}>
+                                            <h3>{course.title}</h3>
+                                            {statusInfo && (
+                                                <span className={`${styles.statusBadge} ${statusInfo.className}`}>
+                                                    {statusInfo.label}
+                                                </span>
+                                            )}
+                                        </div>
                                         <p className={styles.shortNote}>{course.short_note}</p>
                                         <div className={styles.courseMeta}>
                                             <span className={styles.fieldBadge}>

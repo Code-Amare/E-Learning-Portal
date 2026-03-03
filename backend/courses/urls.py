@@ -7,6 +7,7 @@ from .views import (
     CourseOperationView,
     UserCourseProgressView,
     UserCourseView,
+    GetCoursesWithProgressView,
 )
 
 urlpatterns = [
@@ -32,4 +33,7 @@ urlpatterns = [
         name="course-progress",
     ),
     path("user/<int:user_id>/", UserCourseView.as_view(), name="student-courses"),
+    path(
+        "with-progress/", GetCoursesWithProgressView.as_view(), name="student-courses"
+    ),
 ]

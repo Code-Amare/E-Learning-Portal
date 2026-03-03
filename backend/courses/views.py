@@ -44,6 +44,69 @@ class GetCourseView(APIView):
         return Response({"courses": course_serializers.data}, status=status.HTTP_200_OK)
 
 
+class GetCoursesWithProgressView(APIView):
+    authentication_classes = [JWTCookieAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        # Get all courses
+        courses = Course.objects.all().order_by("-created_at")
+
+        # Get user's progress for all courses (efficient query)
+        user_progress = {
+            progress.course_id: progress
+            for progress in UserCourseProgress.objects.filter(user=user)
+        }
+
+        # Prepare response
+        course_list = []
+        for course in courses:
+            course_data = CourseSerializer(course).data
+            progress = user_progress.get(course.id)
+
+            if progress:
+                course_data["progress"] = {
+                    "status": progress.status,
+                    "label": (
+                        "In Progress" if progress.status == "started" else "Completed"
+                    ),
+                    "started_at": progress.started_at,
+                    "finished_at": progress.finished_at,
+                }
+            else:
+                course_data["progress"] = {
+                    "status": "not_started",
+                    "label": "Not Started",
+                    "started_at": None,
+                    "finished_at": None,
+                }
+
+            course_list.append(course_data)
+
+        # Calculate counts
+        started_count = len(
+            [p for p in user_progress.values() if p.status == "started"]
+        )
+        finished_count = len(
+            [p for p in user_progress.values() if p.status == "finished"]
+        )
+
+        return Response(
+            {
+                "courses": course_list,
+                "summary": {
+                    "total_courses": len(courses),
+                    "started": started_count,
+                    "finished": finished_count,
+                    "not_started": len(courses) - (started_count + finished_count),
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
 class CourseOperationView(APIView):
     authentication_classes = [JWTCookieAuthentication]
     permission_classes = [IsAdminUser]
@@ -98,6 +161,7 @@ class CourseOperationView(APIView):
 
 
 class UserCourseProgressView(APIView):
+    authentication_classes = [JWTCookieAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, course_id):

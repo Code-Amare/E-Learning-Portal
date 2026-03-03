@@ -4,6 +4,7 @@
   background: var(--bg-body);
 }
 
+/* Header */
 .header {
   margin-bottom: 24px;
 }
@@ -27,6 +28,7 @@
   background: var(--bg-body);
 }
 
+/* Main content */
 .content {
   max-width: 900px;
   margin: 0 auto;
@@ -45,6 +47,10 @@
 }
 
 .meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 24px;
 }
 
@@ -60,6 +66,27 @@
   font-weight: 500;
 }
 
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.statusBadge.finished {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.statusBadge.started {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+
+/* Video container */
 .videoContainer {
   position: relative;
   width: 100%;
@@ -96,6 +123,7 @@
   color: var(--border-color);
 }
 
+/* Sections */
 .section {
   margin-bottom: 32px;
 }
@@ -116,6 +144,63 @@
   line-height: 1.6;
   color: var(--text-primary);
   white-space: pre-wrap;
+}
+
+/* Finish button */
+.finishSection {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.finishBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.finishBtn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.finishBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Completed message */
+.completedMessage {
+  margin-top: 32px;
+  padding: 16px;
+  background: var(--success-light);
+  border: 1px solid var(--success);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--success);
+  font-weight: 500;
 }
 
 /* Loading & Not Found */
@@ -140,12 +225,6 @@
   margin-bottom: 16px;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .notFound h2 {
   font-size: 24px;
   font-weight: 600;
@@ -159,6 +238,98 @@
   margin-bottom: 24px;
 }
 
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background: var(--bg-surface);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  padding: 24px;
+  text-align: center;
+}
+
+.modalContent p {
+  font-size: 16px;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modalCancelBtn,
+.modalConfirmBtn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalCancelBtn {
+  background: var(--bg-body);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.modalCancelBtn:hover {
+  background: var(--bg-surface);
+}
+
+.modalConfirmBtn {
+  background: var(--primary);
+  color: white;
+}
+
+.modalConfirmBtn:hover {
+  background: var(--primary-hover);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .title {
@@ -167,5 +338,20 @@
 
   .content {
     padding: 16px;
+  }
+
+  .modal {
+    width: 95%;
+  }
+}
+
+@media (max-width: 480px) {
+  .meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .finishBtn {
+    width: 100%;
   }
 }
